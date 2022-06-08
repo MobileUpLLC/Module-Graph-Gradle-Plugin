@@ -17,7 +17,7 @@ class TestPlugin {
     fun configureProject(){
         val pluginId = "ru.mobileup.module-graph"
         val extensionId = "moduleGraphExtension"
-        val featureDir = File("/Users/Takexito/StudioProjects/Module-Graph-Gradle-Plugin/src/main")
+        val featureDir = File("/Users/Takexito/StudioProjects/Module-Graph-Gradle-Plugin/src/test/kotlin/features")
         val resultFile = File("/Users/Takexito/StudioProjects/Module-Graph-Gradle-Plugin/result.txt")
         val project = ProjectBuilder.builder().build()
 
@@ -34,7 +34,7 @@ class TestPlugin {
         project = null
     }
 
-    fun <T: Task> getTask(name: String): T{
+    private fun <T: Task> getTask(name: String): T{
         val task = project!!.tasks.findByName(name)
         assertNotNull(task)
         return (task!! as T)
