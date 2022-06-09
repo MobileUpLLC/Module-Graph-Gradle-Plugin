@@ -4,6 +4,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Property
 import java.io.File
 
 
@@ -11,9 +12,9 @@ import java.io.File
 abstract class ModuleGraphExtension {
     abstract val featuresDir: DirectoryProperty
     abstract val resultFile: RegularFileProperty
+    abstract val applicationId: Property<String>
 
     init {
-
         featuresDir.convention(featuresDir.dir(DEFAULT_FEATURES_PATH))
         resultFile.convention { File(DEFAULT_RESULT_PATH) }
     }
@@ -32,5 +33,6 @@ class ModuleGraphPlugin : Plugin<Project> {
             project.extensions.create("moduleGraphExtension", ModuleGraphExtension::class.java)
         task.inputDirectory.set(extension.featuresDir)
         task.outputFile.set(extension.resultFile)
+        task.applicationId.set(extension.applicationId)
     }
 }

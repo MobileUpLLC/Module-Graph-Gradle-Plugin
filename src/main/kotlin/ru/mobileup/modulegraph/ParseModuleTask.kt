@@ -1,11 +1,12 @@
 package ru.mobileup.modulegraph
 
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
@@ -17,21 +18,30 @@ abstract class ParseModuleTask : DefaultTask() {
     @InputDirectory
     val inputDirectory: DirectoryProperty = project.objects.directoryProperty()
 
+    @Input
+    val applicationId: Property<String> = project.objects.property(String::class.java)
+
     @OutputFile
     val outputFile: RegularFileProperty = project.objects.fileProperty()
 
     @TaskAction
     fun run() {
         val files = inputDirectory.get().asFile
+        val modules = findPackageModuleDependencies(files)
+        prepareOutput(modules)
+    }
 
+    private fun findPackageModuleDependencies(files: File): Set<Module> {
         val modules = getPackageModules(files)
         modules.forEach {
             searchDependencies(it, modules)
         }
+        return modules
+    }
 
+    private fun prepareOutput(modules: Set<Module>) {
         val json = Json.encodeToString(modules)
         val resultPath = outputFile.get().asFile.toPath()
-
         Files.writeString(resultPath, json)
     }
 
@@ -50,8 +60,9 @@ abstract class ParseModuleTask : DefaultTask() {
         val file = File(module.path)
         modules.forEach { other ->
             if (other.id != module.id) {
-                val result = checkImports(other.id, file)
-                if (result) module.dependency.add(other)
+                val import = "import ${applicationId.get()}.${other.id}"
+                val result = checkImports(import, file)
+                if (result) module.dependency.add(other.toDependency())
             }
         }
     }
@@ -75,20 +86,12 @@ abstract class ParseModuleTask : DefaultTask() {
         val folderEntries = folder.listFiles()
         var interrupt = false
         folderEntries?.forEach { entry ->
-            if (interrupt) return true
-            if (entry.isDirectory) {
-                interrupt = processFilesFromFolder(entry, actionOnFile)
-            } else {
-                return actionOnFile.invoke(entry)
+            when {
+                interrupt -> return true
+                entry.isDirectory -> interrupt = processFilesFromFolder(entry, actionOnFile)
+                else -> return actionOnFile.invoke(entry)
             }
         }
         return false
     }
-
-    @Serializable
-    data class Module(
-        val id: String,
-        val path: String,
-        val dependency: MutableSet<Module> = mutableSetOf()
-    )
 }

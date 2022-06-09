@@ -18,13 +18,15 @@ class TestPlugin {
         val pluginId = "ru.mobileup.module-graph"
         val extensionId = "moduleGraphExtension"
         val featureDir = File("/Users/Takexito/StudioProjects/Module-Graph-Gradle-Plugin/src/test/kotlin/features")
-        val resultFile = File("/Users/Takexito/StudioProjects/Module-Graph-Gradle-Plugin/result.txt")
+        val resultFile = File("/Users/Takexito/StudioProjects/Module-Graph-Gradle-Plugin/result.json")
+        val applicationId = "features"
         val project = ProjectBuilder.builder().build()
 
         project.plugins.apply(pluginId)
         project.extensions.configure<ModuleGraphExtension>(extensionId) {
             it.featuresDir.set(featureDir)
             it.resultFile.set(resultFile)
+            it.applicationId.set(applicationId)
         }
         this.project = project
     }
