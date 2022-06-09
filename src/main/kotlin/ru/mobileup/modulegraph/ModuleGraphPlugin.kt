@@ -13,10 +13,13 @@ abstract class ModuleGraphExtension {
     abstract val featuresDir: DirectoryProperty
     abstract val resultFile: RegularFileProperty
     abstract val applicationId: Property<String>
+    abstract val resultDotFile: RegularFileProperty
+
 
     init {
         featuresDir.convention(featuresDir.dir(DEFAULT_FEATURES_PATH))
         resultFile.convention { File(DEFAULT_RESULT_PATH) }
+        resultDotFile.convention { File(DEFAULT_RESULT_PATH) }
     }
 
     companion object {
@@ -29,10 +32,15 @@ class ModuleGraphPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
         val task = project.tasks.create("parseModules", ParseModuleTask::class.java)
+        val task2 = project.tasks.create("generateDotFile", CreateDotFileTask::class.java)
+
         val extension =
             project.extensions.create("moduleGraphExtension", ModuleGraphExtension::class.java)
         task.inputDirectory.set(extension.featuresDir)
         task.outputFile.set(extension.resultFile)
         task.applicationId.set(extension.applicationId)
+
+        task2.inputFile.set(extension.resultFile)
+        task2.outputFile.set(extension.resultDotFile)
     }
 }
