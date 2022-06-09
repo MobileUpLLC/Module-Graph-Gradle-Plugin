@@ -1,5 +1,8 @@
 package ru.mobileup.modulegraph
 
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
@@ -8,7 +11,6 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 import java.nio.file.Files
-import java.util.*
 
 abstract class ParseModuleTask : DefaultTask() {
 
@@ -27,13 +29,10 @@ abstract class ParseModuleTask : DefaultTask() {
             searchDependencies(it, modules)
         }
 
-        modules.forEach{
-            println(it.id)
-            it.dependency.forEach { module ->
-                println("-> ${module.id}")
-            }
-            println()
-        }
+        val json = Json.encodeToString(modules)
+        val resultPath = outputFile.get().asFile.toPath()
+
+        Files.writeString(resultPath, json)
     }
 
     private fun getPackageModules(dir: File): Set<Module> {
@@ -86,6 +85,7 @@ abstract class ParseModuleTask : DefaultTask() {
         return false
     }
 
+    @Serializable
     data class Module(
         val id: String,
         val path: String,
