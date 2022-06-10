@@ -20,19 +20,19 @@ class TestPlugin {
         val pluginId = "ru.mobileup.module-graph"
         val extensionId = "moduleGraphExtension"
         val featureDir = File("/Users/Takexito/StudioProjects/Module-Graph-Gradle-Plugin/src/test/kotlin/features")
-        val resultFile = File("/Users/Takexito/StudioProjects/Module-Graph-Gradle-Plugin/graph/result.json")
-        val resultDotFile = File("/Users/Takexito/StudioProjects/Module-Graph-Gradle-Plugin/graph/result.dot")
-        val resultImageFile = File("/Users/Takexito/StudioProjects/Module-Graph-Gradle-Plugin/graph/result.svg")
+//        val resultFile = File("/Users/Takexito/StudioProjects/Module-Graph-Gradle-Plugin/graph/result.json")
+//        val resultDotFile = File("/Users/Takexito/StudioProjects/Module-Graph-Gradle-Plugin/graph/result.dot")
+//        val resultImageFile = File("/Users/Takexito/StudioProjects/Module-Graph-Gradle-Plugin/graph/result.svg")
         val applicationId = "features"
         val project = ProjectBuilder.builder().build()
 
         project.plugins.apply(pluginId)
         project.extensions.configure<ModuleGraphExtension>(extensionId) {
-            it.featuresDir.set(featureDir)
-            it.resultFile.set(resultFile)
+            it.featuresDir.set(featureDir.path)
+//            it.resultFile.set(resultFile)
             it.applicationId.set(applicationId)
-            it.resultDotFile.set(resultDotFile)
-            it.resultImageFile.set(resultImageFile)
+//            it.resultDotFile.set(resultDotFile)
+//            it.resultImageFile.set(resultImageFile)
         }
         this.project = project
     }
@@ -48,24 +48,24 @@ class TestPlugin {
         return (task!! as T)
     }
 
-    @Test
-    fun checkModule() {
-        val taskName = "parseModules"
-        val task = getTask<ParseModuleTask>(taskName)
-        task.run()
-    }
-
-    @Test
-    fun checkDotFile(){
-        val taskName = "generateDotFile"
-        val task = getTask<CreateDotFileTask>(taskName)
-        task.run()
-    }
-
-    @Test
-    fun checkImageFile(){
-        val taskName = "generateImageFile"
-        val task = getTask<GenerateGraphImageTask>(taskName)
-        task.run()
-    }
+//    @Test
+//    fun checkModule() {
+//        val taskName = "parseModules"
+//        val task = getTask<ParseModuleTask>(taskName)
+//        task.run()
+//    }
+//
+//    @Test
+//    fun checkDotFile(){
+//        val taskName = "generateDotFile"
+//        val task = getTask<CreateDotFileTask>(taskName)
+//        task.run()
+//    }
+//
+//    @Test
+//    fun checkImageFile(){
+//        val taskName = "generateImageFile"
+//        val task = getTask<GenerateGraphImageTask>(taskName)
+//        task.run()
+//    }
 }

@@ -3,8 +3,6 @@ package ru.mobileup.modulegraph
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
@@ -12,23 +10,21 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 import java.nio.file.Files
-import java.nio.file.Path
-import kotlin.io.path.notExists
 
 abstract class ParseModuleTask : DefaultTask() {
 
     @InputDirectory
-    val inputDirectory: DirectoryProperty = project.objects.directoryProperty()
+    val inputDirectory: Property<String> = project.objects.property(String::class.java)
 
     @Input
     val applicationId: Property<String> = project.objects.property(String::class.java)
 
     @OutputFile
-    val outputFile: RegularFileProperty = project.objects.fileProperty()
+    val outputFile: Property<String> = project.objects.property(String::class.java)
 
     @TaskAction
     fun run() {
-        val files = inputDirectory.get().asFile
+        val files = File(project.projectDir.path + "/" + inputDirectory.get())
         val modules = findPackageModuleDependencies(files)
         prepareOutput(modules)
     }
@@ -36,6 +32,7 @@ abstract class ParseModuleTask : DefaultTask() {
     private fun findPackageModuleDependencies(files: File): Set<Module> {
         val modules = getPackageModules(files)
         modules.forEach {
+            println("SearchDependency for module - ${it.id}")
             searchDependencies(it, modules)
         }
         return modules
@@ -43,7 +40,7 @@ abstract class ParseModuleTask : DefaultTask() {
 
     private fun prepareOutput(modules: Set<Module>) {
         val json = Json.encodeToString(modules)
-        val resultPath = outputFile.get().asFile.toPath()
+        val resultPath = File(project.projectDir.path + "/" + outputFile.get()).toPath()
         resultPath.createPathIfNotExist()
         Files.writeString(resultPath, json)
     }
@@ -64,6 +61,7 @@ abstract class ParseModuleTask : DefaultTask() {
         modules.forEach { other ->
             if (other.id != module.id) {
                 val import = "import ${applicationId.get()}.${other.id}"
+                println("Check Import: ${other.id} at ${module.id} ")
                 val result = checkImports(import, file)
                 if (result) module.dependency.add(other.toDependency())
             }
@@ -79,7 +77,10 @@ abstract class ParseModuleTask : DefaultTask() {
     private fun searchImports(import: String, file: File): Boolean {
         val strings = Files.readAllLines(file.toPath())
         val filteredStrings = strings.filter { it.contains(import) }
-        return filteredStrings.isNotEmpty()
+        val result = filteredStrings.isNotEmpty()
+        if(file.path.contains("app_theme")) println("AppThemeFound: Import - ${result}")
+
+        return result
     }
 
     private fun processFilesFromFolder(
@@ -88,13 +89,19 @@ abstract class ParseModuleTask : DefaultTask() {
     ): Boolean {
         val folderEntries = folder.listFiles()
         var interrupt = false
+        var hasImports: Boolean
         folderEntries?.forEach { entry ->
+            if(entry.path.contains("app_theme")) println("AppThemeFound: Entry - ${entry.path}")
             when {
                 interrupt -> return true
                 entry.isDirectory -> interrupt = processFilesFromFolder(entry, actionOnFile)
-                else -> return actionOnFile.invoke(entry)
+                else -> {
+                    hasImports = actionOnFile.invoke(entry)
+                    if(entry.path.contains("app_theme")) println("AppThemeFound: ${entry.path} has imports - ${hasImports}")
+                    if (hasImports) return true
+                }
             }
         }
-        return false
+        return interrupt
     }
 }
