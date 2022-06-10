@@ -12,6 +12,8 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 import java.nio.file.Files
+import java.nio.file.Path
+import kotlin.io.path.notExists
 
 abstract class ParseModuleTask : DefaultTask() {
 
@@ -42,6 +44,7 @@ abstract class ParseModuleTask : DefaultTask() {
     private fun prepareOutput(modules: Set<Module>) {
         val json = Json.encodeToString(modules)
         val resultPath = outputFile.get().asFile.toPath()
+        resultPath.createPathIfNotExist()
         Files.writeString(resultPath, json)
     }
 

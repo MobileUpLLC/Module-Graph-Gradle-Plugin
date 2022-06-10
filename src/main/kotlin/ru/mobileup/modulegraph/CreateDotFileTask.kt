@@ -1,7 +1,6 @@
 package ru.mobileup.modulegraph
 
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
@@ -40,7 +39,9 @@ abstract class CreateDotFileTask : DefaultTask() {
     }
 
     private fun prepareDotFileToStart(dotFile: File) {
-        Files.writeString(dotFile.toPath(), "digraph {\n")
+        val path = dotFile.toPath()
+        path.createPathIfNotExist()
+        Files.writeString(path, "digraph {\n")
     }
 
     private fun prepareDotFileToEnd(dotFile: File) {
