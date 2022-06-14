@@ -5,6 +5,7 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import ru.mobileup.modulegraph.CreateDotFileTask
 import ru.mobileup.modulegraph.ModuleGraphExtension
 import ru.mobileup.modulegraph.ParseModuleTask
 import java.io.File
@@ -17,14 +18,18 @@ class TestPlugin {
     fun configureProject(){
         val pluginId = "ru.mobileup.module-graph"
         val extensionId = "moduleGraphExtension"
-        val featureDir = File("/Users/Takexito/StudioProjects/Module-Graph-Gradle-Plugin/src/main")
-        val resultFile = File("/Users/Takexito/StudioProjects/Module-Graph-Gradle-Plugin/result.txt")
+        val featureDir = File("/Users/Takexito/StudioProjects/Module-Graph-Gradle-Plugin/src/test/kotlin/features")
+        val resultFile = File("/Users/Takexito/StudioProjects/Module-Graph-Gradle-Plugin/result.json")
+        val resultDotFile = File("/Users/Takexito/StudioProjects/Module-Graph-Gradle-Plugin/result.dot")
+        val applicationId = "features"
         val project = ProjectBuilder.builder().build()
 
         project.plugins.apply(pluginId)
         project.extensions.configure<ModuleGraphExtension>(extensionId) {
             it.featuresDir.set(featureDir)
             it.resultFile.set(resultFile)
+            it.applicationId.set(applicationId)
+            it.resultDotFile.set(resultDotFile)
         }
         this.project = project
     }
@@ -34,7 +39,7 @@ class TestPlugin {
         project = null
     }
 
-    fun <T: Task> getTask(name: String): T{
+    private fun <T: Task> getTask(name: String): T{
         val task = project!!.tasks.findByName(name)
         assertNotNull(task)
         return (task!! as T)
@@ -44,6 +49,13 @@ class TestPlugin {
     fun checkModule() {
         val taskName = "parseModules"
         val task = getTask<ParseModuleTask>(taskName)
+        task.run()
+    }
+
+    @Test
+    fun checkDotFile(){
+        val taskName = "generateDotFile"
+        val task = getTask<CreateDotFileTask>(taskName)
         task.run()
     }
 }
