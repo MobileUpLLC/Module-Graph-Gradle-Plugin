@@ -20,7 +20,7 @@ abstract class CreateDotFileTask : DefaultTask() {
     private val dotFileStartString = "digraph {\n"
     private val dotFileEndString = "}\n"
     private fun getDependencyString(module: Module, dependencyModule: DependencyModule) =
-        "$module -> $dependencyModule\n"
+        "${module.id} -> ${dependencyModule.id}\n"
 
     private fun getModuleString(module: Module) = "${module.id}\n"
 

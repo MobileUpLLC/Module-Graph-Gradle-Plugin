@@ -60,7 +60,7 @@ abstract class ParseModuleDependenciesTask : DefaultTask() {
         val file = File(module.path)
         modules.forEach { other ->
             if (other.id != module.id) {
-                val import = getImportString(module)
+                val import = getImportString(other)
                 val result = checkImports(import, file)
                 if (result) module.dependency.add(other.toDependency())
             }
