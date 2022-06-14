@@ -3,8 +3,6 @@ package ru.mobileup.modulegraph
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
@@ -16,17 +14,17 @@ import java.nio.file.Files
 abstract class ParseModuleTask : DefaultTask() {
 
     @InputDirectory
-    val inputDirectory: DirectoryProperty = project.objects.directoryProperty()
+    val inputDirectory: Property<String> = project.objects.property(String::class.java)
 
     @Input
     val applicationId: Property<String> = project.objects.property(String::class.java)
 
     @OutputFile
-    val outputFile: RegularFileProperty = project.objects.fileProperty()
+    val outputFile: Property<String> = project.objects.property(String::class.java)
 
     @TaskAction
     fun run() {
-        val files = inputDirectory.get().asFile
+        val files = File(project.projectDir.path + "/" + inputDirectory.get())
         val modules = findPackageModuleDependencies(files)
         prepareOutput(modules)
     }
@@ -41,7 +39,8 @@ abstract class ParseModuleTask : DefaultTask() {
 
     private fun prepareOutput(modules: Set<Module>) {
         val json = Json.encodeToString(modules)
-        val resultPath = outputFile.get().asFile.toPath()
+        val resultPath = File(project.projectDir.path + "/" + outputFile.get()).toPath()
+        resultPath.createPathIfNotExist()
         Files.writeString(resultPath, json)
     }
 
@@ -76,6 +75,7 @@ abstract class ParseModuleTask : DefaultTask() {
     private fun searchImports(import: String, file: File): Boolean {
         val strings = Files.readAllLines(file.toPath())
         val filteredStrings = strings.filter { it.contains(import) }
+
         return filteredStrings.isNotEmpty()
     }
 
@@ -85,13 +85,17 @@ abstract class ParseModuleTask : DefaultTask() {
     ): Boolean {
         val folderEntries = folder.listFiles()
         var interrupt = false
+        var hasImports: Boolean
         folderEntries?.forEach { entry ->
             when {
                 interrupt -> return true
                 entry.isDirectory -> interrupt = processFilesFromFolder(entry, actionOnFile)
-                else -> return actionOnFile.invoke(entry)
+                else -> {
+                    hasImports = actionOnFile.invoke(entry)
+                    if (hasImports) return true
+                }
             }
         }
-        return false
+        return interrupt
     }
 }

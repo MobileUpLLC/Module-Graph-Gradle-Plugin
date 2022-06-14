@@ -1,10 +1,10 @@
 package ru.mobileup.modulegraph
 
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
@@ -15,15 +15,15 @@ import java.nio.file.StandardOpenOption
 abstract class CreateDotFileTask : DefaultTask() {
 
     @InputFile
-    val inputFile: RegularFileProperty = project.objects.fileProperty()
+    val inputFile: Property<String> = project.objects.property(String::class.java)
 
     @OutputFile
-    val outputFile: RegularFileProperty = project.objects.fileProperty()
+    val outputFile: Property<String> = project.objects.property(String::class.java)
 
     @TaskAction
     fun run() {
-        val file = inputFile.get().asFile
-        val outputF = outputFile.get().asFile
+        val file = File(project.projectDir.path + "/" + inputFile.get())
+        val outputF = File(project.projectDir.path + "/" + outputFile.get())
         val modules = prepareInput(file)
 
         prepareDotFileToStart(outputF)
@@ -40,7 +40,9 @@ abstract class CreateDotFileTask : DefaultTask() {
     }
 
     private fun prepareDotFileToStart(dotFile: File) {
-        Files.writeString(dotFile.toPath(), "digraph {\n")
+        val path = dotFile.toPath()
+        path.createPathIfNotExist()
+        Files.writeString(path, "digraph {\n")
     }
 
     private fun prepareDotFileToEnd(dotFile: File) {
