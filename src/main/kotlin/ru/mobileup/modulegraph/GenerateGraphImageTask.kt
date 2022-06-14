@@ -20,8 +20,6 @@ abstract class GenerateGraphImageTask : DefaultTask() {
     fun run() {
         val file = File(project.projectDir.path + "/" + inputFile.get())
         val outputF = File(project.projectDir.path + "/" + outputFile.get())
-        println("InputFile : ${file.absolutePath}")
-        println("OutputFile : ${outputF.absolutePath}")
 
         val dotCommand = listOf("dot", "-Tsvg", file.path, "-o", outputF.path)
         ProcessBuilder(dotCommand)

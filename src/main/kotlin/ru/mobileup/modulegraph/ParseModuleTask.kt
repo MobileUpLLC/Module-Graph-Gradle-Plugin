@@ -32,7 +32,6 @@ abstract class ParseModuleTask : DefaultTask() {
     private fun findPackageModuleDependencies(files: File): Set<Module> {
         val modules = getPackageModules(files)
         modules.forEach {
-            println("SearchDependency for module - ${it.id}")
             searchDependencies(it, modules)
         }
         return modules
@@ -61,7 +60,6 @@ abstract class ParseModuleTask : DefaultTask() {
         modules.forEach { other ->
             if (other.id != module.id) {
                 val import = "import ${applicationId.get()}.${other.id}"
-                println("Check Import: ${other.id} at ${module.id} ")
                 val result = checkImports(import, file)
                 if (result) module.dependency.add(other.toDependency())
             }
@@ -77,10 +75,8 @@ abstract class ParseModuleTask : DefaultTask() {
     private fun searchImports(import: String, file: File): Boolean {
         val strings = Files.readAllLines(file.toPath())
         val filteredStrings = strings.filter { it.contains(import) }
-        val result = filteredStrings.isNotEmpty()
-        if(file.path.contains("app_theme")) println("AppThemeFound: Import - ${result}")
 
-        return result
+        return filteredStrings.isNotEmpty()
     }
 
     private fun processFilesFromFolder(
@@ -91,13 +87,11 @@ abstract class ParseModuleTask : DefaultTask() {
         var interrupt = false
         var hasImports: Boolean
         folderEntries?.forEach { entry ->
-            if(entry.path.contains("app_theme")) println("AppThemeFound: Entry - ${entry.path}")
             when {
                 interrupt -> return true
                 entry.isDirectory -> interrupt = processFilesFromFolder(entry, actionOnFile)
                 else -> {
                     hasImports = actionOnFile.invoke(entry)
-                    if(entry.path.contains("app_theme")) println("AppThemeFound: ${entry.path} has imports - ${hasImports}")
                     if (hasImports) return true
                 }
             }
