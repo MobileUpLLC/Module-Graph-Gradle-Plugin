@@ -22,7 +22,7 @@ fun File.processFilesFromFolder(actionOnFile: (file: File) -> Boolean): Boolean 
     folderEntries?.forEach { entry ->
         when {
             interrupt -> return true
-            entry.isDirectory -> interrupt = processFilesFromFolder(actionOnFile)
+            entry.isDirectory -> interrupt = entry.processFilesFromFolder(actionOnFile)
             else -> {
                 hasImports = actionOnFile.invoke(entry)
                 if (hasImports) return true
