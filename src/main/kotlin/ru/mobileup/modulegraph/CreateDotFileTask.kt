@@ -3,7 +3,6 @@ package ru.mobileup.modulegraph
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputFile
@@ -14,55 +13,75 @@ import java.nio.file.StandardOpenOption
 
 abstract class CreateDotFileTask : DefaultTask() {
 
+    private val dotFileStartString = "digraph {\n"
+    private val dotFileEndString = "}\n"
+    private fun getDependencyString(module: Module, dependencyModule: DependencyModule) =
+        "$module -> $dependencyModule\n"
+
+    private fun getModuleString(module: Module) = "${module.id}\n"
+
     @InputFile
-    val inputFile: Property<String> = project.objects.property(String::class.java)
+    val moduleDependenciesJsonFile: Property<String> = project.objects.property(String::class.java)
 
     @OutputFile
-    val outputFile: Property<String> = project.objects.property(String::class.java)
+    val outputDotFile: Property<String> = project.objects.property(String::class.java)
 
     @TaskAction
     fun run() {
-        val file = File(project.projectDir.path + "/" + inputFile.get())
-        val outputF = File(project.projectDir.path + "/" + outputFile.get())
-        val modules = prepareInput(file)
+        val modulesFile = moduleDependenciesJsonFile.get().getFileFromProjectRelativePath(project)
+        val outputDotFile = outputDotFile.get().getFileFromProjectRelativePath(project)
+        val modules = prepareInput(modulesFile)
 
-        prepareDotFileToStart(outputF)
+        writeDotFile(outputDotFile, modules)
+    }
+
+    private fun writeDotFile(
+        outputDotFile: File,
+        modules: Set<Module>
+    ) {
+        prepareDotFileToStart(outputDotFile)
 
         modules.forEach { module ->
-            addModuleToDot(outputF, module)
+            addModuleToDot(outputDotFile, module)
         }
 
         modules.forEach { module ->
-            addModuleDependenciesToDot(outputF, module)
+            addModuleDependenciesToDot(outputDotFile, module)
         }
 
-        prepareDotFileToEnd(outputF)
+        prepareDotFileToEnd(outputDotFile)
     }
 
     private fun prepareDotFileToStart(dotFile: File) {
         val path = dotFile.toPath()
         path.createPathIfNotExist()
-        Files.writeString(path, "digraph {\n")
+        Files.writeString(path, dotFileStartString)
     }
 
     private fun prepareDotFileToEnd(dotFile: File) {
-        Files.writeString(dotFile.toPath(), "}\n", StandardOpenOption.APPEND)
+        Files.writeString(dotFile.toPath(), dotFileEndString, StandardOpenOption.APPEND)
     }
 
     private fun addModuleToDot(dotFile: File, module: Module) {
-        Files.writeString(dotFile.toPath(), "${module.id}\n", StandardOpenOption.APPEND)
+        val string = getModuleString(module)
+        Files.writeString(dotFile.toPath(), string, StandardOpenOption.APPEND)
     }
 
     private fun addModuleDependenciesToDot(dotFile: File, module: Module) {
         module.dependency.forEach { dependencyModule ->
-            addModuleDependencyToDot(dotFile, module.id, dependencyModule.id)
+            addModuleDependencyToDot(dotFile, module, dependencyModule)
         }
     }
 
-    private fun addModuleDependencyToDot(dotFile: File, module: String, dependencyModule: String) {
+    private fun addModuleDependencyToDot(
+        dotFile: File,
+        module: Module,
+        dependencyModule: DependencyModule
+    ) {
+        val string = getDependencyString(module, dependencyModule)
         Files.writeString(
             dotFile.toPath(),
-            "$module -> $dependencyModule\n",
+            string,
             StandardOpenOption.APPEND
         )
     }

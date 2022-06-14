@@ -2,10 +2,7 @@ package ru.mobileup.modulegraph
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
-import java.io.File
 
 
 @Suppress("LeakingThis")
@@ -35,20 +32,20 @@ abstract class ModuleGraphExtension {
 class ModuleGraphPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
-        val task = project.tasks.create("parseModules", ParseModuleTask::class.java)
+        val task = project.tasks.create("parseModules", ParseModuleDependenciesTask::class.java)
         val task2 = project.tasks.create("generateDotFile", CreateDotFileTask::class.java)
         val task3 = project.tasks.create("generateImageFile", GenerateGraphImageTask::class.java)
 
         val extension =
             project.extensions.create("moduleGraphExtension", ModuleGraphExtension::class.java)
-        task.inputDirectory.set(extension.featuresDir)
-        task.outputFile.set(extension.resultFile)
+        task.featuresDirectory.set(extension.featuresDir)
+        task.outputJsonFile.set(extension.resultFile)
         task.applicationId.set(extension.applicationId)
 
-        task2.inputFile.set(extension.resultFile)
-        task2.outputFile.set(extension.resultDotFile)
+        task2.moduleDependenciesJsonFile.set(extension.resultFile)
+        task2.outputDotFile.set(extension.resultDotFile)
 
-        task3.inputFile.set(extension.resultDotFile)
-        task3.outputFile.set(extension.resultImageFile)
+        task3.dotFilePath.set(extension.resultDotFile)
+        task3.outputFilePath.set(extension.resultImageFile)
     }
 }
