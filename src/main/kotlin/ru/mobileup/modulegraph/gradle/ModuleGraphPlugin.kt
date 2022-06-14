@@ -1,8 +1,11 @@
-package ru.mobileup.modulegraph
+package ru.mobileup.modulegraph.gradle
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
+import ru.mobileup.modulegraph.gradle.tasks.CreateDotFileTask
+import ru.mobileup.modulegraph.gradle.tasks.GenerateGraphImageTask
+import ru.mobileup.modulegraph.gradle.tasks.ParseModuleDependenciesTask
 
 
 @Suppress("LeakingThis")

@@ -1,4 +1,4 @@
-package ru.mobileup.modulegraph
+package ru.mobileup.modulegraph.gradle.tasks
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -7,6 +7,10 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import ru.mobileup.modulegraph.DependencyModule
+import ru.mobileup.modulegraph.Module
+import ru.mobileup.modulegraph.createPathIfNotExist
+import ru.mobileup.modulegraph.getFileFromProjectRelativePath
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardOpenOption

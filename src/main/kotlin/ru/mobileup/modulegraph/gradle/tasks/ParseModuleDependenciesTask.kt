@@ -1,4 +1,4 @@
-package ru.mobileup.modulegraph
+package ru.mobileup.modulegraph.gradle.tasks
 
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -8,6 +8,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import ru.mobileup.modulegraph.*
 import java.io.File
 import java.nio.file.Files
 
@@ -17,8 +18,10 @@ abstract class ParseModuleDependenciesTask : DefaultTask() {
 
     @InputDirectory
     val featuresDirectory: Property<String> = project.objects.property(String::class.java)
+
     @Input
     val applicationId: Property<String> = project.objects.property(String::class.java)
+
     @OutputFile
     val outputJsonFile: Property<String> = project.objects.property(String::class.java)
 
@@ -75,6 +78,4 @@ abstract class ParseModuleDependenciesTask : DefaultTask() {
         val filteredStrings = strings.filter { it.contains(import) }
         return filteredStrings.isNotEmpty()
     }
-
-
 }
