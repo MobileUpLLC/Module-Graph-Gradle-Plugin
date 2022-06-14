@@ -8,7 +8,7 @@ import org.gradle.api.provider.Property
 @Suppress("LeakingThis")
 abstract class ModuleGraphExtension {
     abstract val featuresDir: Property<String>
-    abstract val resultFile: Property<String>
+    abstract val modulesJsonFile: Property<String>
     abstract val applicationId: Property<String>
     abstract val resultDotFile: Property<String>
     abstract val resultImageFile: Property<String>
@@ -16,7 +16,7 @@ abstract class ModuleGraphExtension {
 
     init {
         featuresDir.convention(DEFAULT_FEATURES_PATH)
-        resultFile.convention(DEFAULT_RESULT_PATH)
+        modulesJsonFile.convention(DEFAULT_RESULT_PATH)
         resultDotFile.convention(DEFAULT_RESULT_DOT_PATH)
         resultImageFile.convention(DEFAULT_RESULT_IMAGE_PATH)
     }
@@ -32,20 +32,48 @@ abstract class ModuleGraphExtension {
 class ModuleGraphPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
-        val task = project.tasks.create("parseModules", ParseModuleDependenciesTask::class.java)
-        val task2 = project.tasks.create("generateDotFile", CreateDotFileTask::class.java)
-        val task3 = project.tasks.create("generateImageFile", GenerateGraphImageTask::class.java)
-
         val extension =
-            project.extensions.create("moduleGraphExtension", ModuleGraphExtension::class.java)
-        task.featuresDirectory.set(extension.featuresDir)
-        task.outputJsonFile.set(extension.resultFile)
-        task.applicationId.set(extension.applicationId)
+            project.extensions.create(
+                EXTENSION_NAME,
+                ModuleGraphExtension::class.java
+            )
 
-        task2.moduleDependenciesJsonFile.set(extension.resultFile)
-        task2.outputDotFile.set(extension.resultDotFile)
+        val task1 = project.tasks.register(
+            PARSE_MODULE_DEPENDENCIES_TASK_NAME,
+            ParseModuleDependenciesTask::class.java
+        )
 
-        task3.dotFilePath.set(extension.resultDotFile)
-        task3.outputFilePath.set(extension.resultImageFile)
+        val task2 = project.tasks.register(
+            GENERATE_DOT_FILE_TASK_NAME,
+            CreateDotFileTask::class.java
+        )
+
+        val task3 = project.tasks.register(
+            GENERATE_IMAGE_FILE_TASK_NAME,
+            GenerateGraphImageTask::class.java
+        )
+
+        task1.configure { task ->
+            task.featuresDirectory.set(extension.featuresDir)
+            task.outputJsonFile.set(extension.modulesJsonFile)
+            task.applicationId.set(extension.applicationId)
+        }
+
+        task2.configure { task ->
+            task.outputDotFile.set(extension.resultDotFile)
+            task.moduleDependenciesJsonFile.set(task1.flatMap { it.outputJsonFile })
+        }
+
+        task3.configure { task ->
+            task.outputFilePath.set(extension.resultImageFile)
+            task.dotFilePath.set(task2.flatMap { it.outputDotFile })
+        }
+    }
+
+    companion object {
+        private const val PARSE_MODULE_DEPENDENCIES_TASK_NAME = "parseModuleDependencies"
+        private const val GENERATE_DOT_FILE_TASK_NAME = "generateDotFile"
+        private const val GENERATE_IMAGE_FILE_TASK_NAME = "generateModuleGraph"
+        private const val EXTENSION_NAME = "moduleGraph"
     }
 }
