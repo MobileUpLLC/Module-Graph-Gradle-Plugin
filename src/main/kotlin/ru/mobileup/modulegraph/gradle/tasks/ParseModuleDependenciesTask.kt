@@ -80,7 +80,9 @@ abstract class ParseModuleDependenciesTask : DefaultTask() {
 
     private fun searchImports(import: String, file: File): Boolean {
         val strings = Files.readAllLines(file.toPath())
-        val filteredStrings = strings.filter { it.contains(import) }
-        return filteredStrings.isNotEmpty()
+        strings.forEach {
+            if (it.contains(import)) return true
+        }
+        return false
     }
 }
