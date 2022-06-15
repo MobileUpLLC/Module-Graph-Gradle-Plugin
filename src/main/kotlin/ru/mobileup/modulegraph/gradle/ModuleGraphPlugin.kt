@@ -2,26 +2,28 @@ package ru.mobileup.modulegraph.gradle
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import ru.mobileup.modulegraph.gradle.tasks.CreateDotFileTask
 import ru.mobileup.modulegraph.gradle.tasks.GenerateGraphImageTask
 import ru.mobileup.modulegraph.gradle.tasks.ParseModuleDependenciesTask
+import java.io.File
 
 
 @Suppress("LeakingThis")
 abstract class ModuleGraphExtension {
-    abstract val featuresDir: Property<String>
-    abstract val modulesJsonFile: Property<String>
+    abstract val featuresDir: DirectoryProperty
+    abstract val modulesJsonFile: RegularFileProperty
     abstract val applicationId: Property<String>
-    abstract val resultDotFile: Property<String>
-    abstract val resultImageFile: Property<String>
-
+    abstract val resultDotFile: RegularFileProperty
+    abstract val resultImageFile: RegularFileProperty
 
     init {
-        featuresDir.convention(DEFAULT_FEATURES_PATH)
-        modulesJsonFile.convention(DEFAULT_RESULT_PATH)
-        resultDotFile.convention(DEFAULT_RESULT_DOT_PATH)
-        resultImageFile.convention(DEFAULT_RESULT_IMAGE_PATH)
+        featuresDir.convention(featuresDir.dir(DEFAULT_FEATURES_PATH))
+        modulesJsonFile.convention { File(DEFAULT_RESULT_PATH) }
+        resultDotFile.convention { File(DEFAULT_RESULT_DOT_PATH) }
+        resultImageFile.convention { File(DEFAULT_RESULT_IMAGE_PATH) }
     }
 
     companion object {
@@ -68,8 +70,8 @@ class ModuleGraphPlugin : Plugin<Project> {
         }
 
         task3.configure { task ->
-            task.outputFilePath.set(extension.resultImageFile)
-            task.dotFilePath.set(task2.flatMap { it.outputDotFile })
+            task.outputFile.set(extension.resultImageFile)
+            task.dotFile.set(task2.flatMap { it.outputDotFile })
         }
     }
 

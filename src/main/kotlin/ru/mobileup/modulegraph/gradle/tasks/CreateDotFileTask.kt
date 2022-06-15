@@ -3,14 +3,13 @@ package ru.mobileup.modulegraph.gradle.tasks
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.gradle.api.DefaultTask
-import org.gradle.api.provider.Property
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import ru.mobileup.modulegraph.DependencyModule
 import ru.mobileup.modulegraph.Module
 import ru.mobileup.modulegraph.createPathIfNotExist
-import ru.mobileup.modulegraph.getFileFromProjectRelativePath
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardOpenOption
@@ -25,15 +24,15 @@ abstract class CreateDotFileTask : DefaultTask() {
     private fun getModuleString(module: Module) = "${module.id}\n"
 
     @InputFile
-    val moduleDependenciesJsonFile: Property<String> = project.objects.property(String::class.java)
+    val moduleDependenciesJsonFile: RegularFileProperty = project.objects.fileProperty()
 
     @OutputFile
-    val outputDotFile: Property<String> = project.objects.property(String::class.java)
+    val outputDotFile: RegularFileProperty = project.objects.fileProperty()
 
     @TaskAction
     fun run() {
-        val modulesFile = moduleDependenciesJsonFile.get().getFileFromProjectRelativePath(project)
-        val outputDotFile = outputDotFile.get().getFileFromProjectRelativePath(project)
+        val modulesFile = moduleDependenciesJsonFile.get().asFile
+        val outputDotFile = outputDotFile.get().asFile
         val modules = prepareInput(modulesFile)
 
         writeDotFile(outputDotFile, modules)
