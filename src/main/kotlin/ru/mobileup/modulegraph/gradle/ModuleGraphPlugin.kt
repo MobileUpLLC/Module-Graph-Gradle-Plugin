@@ -3,8 +3,11 @@ package ru.mobileup.modulegraph.gradle
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.FileSystemLocation
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
+import org.gradle.internal.impldep.org.testng.internal.ObjectFactoryImpl
 import ru.mobileup.modulegraph.gradle.tasks.CreateDotFileTask
 import ru.mobileup.modulegraph.gradle.tasks.GenerateGraphImageTask
 import ru.mobileup.modulegraph.gradle.tasks.ParseModuleDependenciesTask
@@ -20,7 +23,6 @@ abstract class ModuleGraphExtension {
     abstract val resultImageFile: RegularFileProperty
 
     init {
-        featuresDir.convention(featuresDir.dir(DEFAULT_FEATURES_PATH))
         modulesJsonFile.convention { File(DEFAULT_RESULT_PATH) }
         resultDotFile.convention { File(DEFAULT_RESULT_DOT_PATH) }
         resultImageFile.convention { File(DEFAULT_RESULT_IMAGE_PATH) }
@@ -30,7 +32,6 @@ abstract class ModuleGraphExtension {
         private const val DEFAULT_RESULT_PATH = "gradle/dependency-graph/modules.json"
         private const val DEFAULT_RESULT_DOT_PATH = "gradle/dependency-graph/modules.dot"
         private const val DEFAULT_RESULT_IMAGE_PATH = "gradle/dependency-graph/modules.svg"
-        private const val DEFAULT_FEATURES_PATH = "src/main/"
     }
 }
 
