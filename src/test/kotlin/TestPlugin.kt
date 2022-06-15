@@ -4,11 +4,7 @@ import org.gradle.internal.impldep.org.testng.Assert.assertNotNull
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.After
 import org.junit.Before
-import org.junit.Test
-import ru.mobileup.modulegraph.CreateDotFileTask
-import ru.mobileup.modulegraph.GenerateGraphImageTask
-import ru.mobileup.modulegraph.ModuleGraphExtension
-import ru.mobileup.modulegraph.ParseModuleTask
+import ru.mobileup.modulegraph.gradle.ModuleGraphExtension
 import java.io.File
 
 class TestPlugin {

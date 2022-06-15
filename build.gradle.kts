@@ -1,24 +1,11 @@
-buildscript {
-
-    repositories {
-        google()
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.21")
-    }
-}
-
-
 apply(plugin = "kotlin")
 apply(plugin = "java-gradle-plugin")
 
 repositories {
     google()
     mavenCentral()
-
 }
+
 plugins {
     `java-library`
     `java-gradle-plugin`
@@ -36,8 +23,8 @@ dependencies {
 gradlePlugin {
     plugins {
         register("module-graph") {
-            id = "ru.mobileup.module-graph"
-            implementationClass = "ru.mobileup.modulegraph.ModuleGraphPlugin"
+            id = "ru.mobileup.modulegraph"
+            implementationClass = "ru.mobileup.modulegraph.gradle.ModuleGraphPlugin"
         }
     }
 }

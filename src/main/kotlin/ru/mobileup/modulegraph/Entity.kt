@@ -15,6 +15,6 @@ data class DependencyModule(
     val path: String,
 )
 
-fun Module.toDependency(): DependencyModule{
+fun Module.toDependency(): DependencyModule {
     return DependencyModule(id, path)
 }
