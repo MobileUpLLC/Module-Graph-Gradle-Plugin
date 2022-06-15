@@ -76,9 +76,9 @@ class ModuleGraphPlugin : Plugin<Project> {
     }
 
     companion object {
-        private const val PARSE_MODULE_DEPENDENCIES_TASK_NAME = "parseModuleDependencies"
-        private const val GENERATE_DOT_FILE_TASK_NAME = "generateDotFile"
-        private const val GENERATE_IMAGE_FILE_TASK_NAME = "generateModuleGraph"
-        private const val EXTENSION_NAME = "moduleGraph"
+        internal const val PARSE_MODULE_DEPENDENCIES_TASK_NAME = "parseModuleDependencies"
+        internal const val GENERATE_DOT_FILE_TASK_NAME = "generateDotFile"
+        internal const val GENERATE_IMAGE_FILE_TASK_NAME = "generateModuleGraph"
+        internal const val EXTENSION_NAME = "moduleGraph"
     }
 }
