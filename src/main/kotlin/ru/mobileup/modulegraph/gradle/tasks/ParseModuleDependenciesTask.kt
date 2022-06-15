@@ -3,12 +3,17 @@ package ru.mobileup.modulegraph.gradle.tasks
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import ru.mobileup.modulegraph.*
+import ru.mobileup.modulegraph.Module
+import ru.mobileup.modulegraph.createPathIfNotExist
+import ru.mobileup.modulegraph.processFilesFromFolder
+import ru.mobileup.modulegraph.toDependency
 import java.io.File
 import java.nio.file.Files
 
@@ -17,17 +22,17 @@ abstract class ParseModuleDependenciesTask : DefaultTask() {
     private fun getImportString(module: Module) = "import ${applicationId.get()}.${module.id}"
 
     @InputDirectory
-    val featuresDirectory: Property<String> = project.objects.property(String::class.java)
+    val featuresDirectory: DirectoryProperty = project.objects.directoryProperty()
 
     @Input
     val applicationId: Property<String> = project.objects.property(String::class.java)
 
     @OutputFile
-    val outputJsonFile: Property<String> = project.objects.property(String::class.java)
+    val outputJsonFile: RegularFileProperty = project.objects.fileProperty()
 
     @TaskAction
     fun run() {
-        val files = featuresDirectory.get().getFileFromProjectRelativePath(project)
+        val files = featuresDirectory.get().asFile
         val modules = findPackageModuleDependencies(files)
         prepareOutput(modules)
     }
@@ -40,7 +45,7 @@ abstract class ParseModuleDependenciesTask : DefaultTask() {
 
     private fun prepareOutput(modules: Set<Module>) {
         val json = Json.encodeToString(modules)
-        val resultPath = outputJsonFile.get().getFileFromProjectRelativePath(project).toPath()
+        val resultPath = outputJsonFile.get().asFile.toPath()
         resultPath.createPathIfNotExist()
         Files.writeString(resultPath, json)
     }
@@ -75,7 +80,9 @@ abstract class ParseModuleDependenciesTask : DefaultTask() {
 
     private fun searchImports(import: String, file: File): Boolean {
         val strings = Files.readAllLines(file.toPath())
-        val filteredStrings = strings.filter { it.contains(import) }
-        return filteredStrings.isNotEmpty()
+        strings.forEach {
+            if (it.contains(import)) return true
+        }
+        return false
     }
 }
