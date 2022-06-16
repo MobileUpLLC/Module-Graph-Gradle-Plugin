@@ -67,13 +67,13 @@ class ModuleGraphPlugin : Plugin<Project> {
         }
 
         task2.configure { task ->
+            task.inputJsonFile.set(task1.flatMap { it.outputJsonFile })
             task.outputDotFile.set(extension.outputDirectory.file(extension.resultDotFileName))
-            task.moduleDependenciesJsonFile.set(task1.flatMap { it.outputJsonFile })
         }
 
         task3.configure { task ->
-            task.outputFile.set(extension.outputDirectory.file(extension.resultDotFileName))
-            task.dotFile.set(task2.flatMap { it.outputDotFile })
+            task.inputDotFile.set(task2.flatMap { it.outputDotFile })
+            task.outputImageFile.set(extension.outputDirectory.file(extension.resultImageFileName))
         }
     }
 }

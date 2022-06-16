@@ -9,20 +9,18 @@ import java.io.File
 
 abstract class GenerateGraphImageTask : DefaultTask() {
 
-    private fun getDotCommand(dotFile: File, outputFile: File) =
-        listOf("dot", "-Tsvg", dotFile.path, "-o", outputFile.path)
+    private fun getDotCommand(inputDotFile: File, outputImageFile: File) =
+        listOf("dot", "-Tsvg", inputDotFile.path, "-o", outputImageFile.path)
 
     @InputFile
-    val dotFile: RegularFileProperty = project.objects.fileProperty()
+    val inputDotFile: RegularFileProperty = project.objects.fileProperty()
 
     @OutputFile
-    val outputFile: RegularFileProperty = project.objects.fileProperty()
+    val outputImageFile: RegularFileProperty = project.objects.fileProperty()
 
     @TaskAction
     fun run() {
-        val dotFile = dotFile.get().asFile
-        val outputFile = outputFile.get().asFile
-        val dotCommand = getDotCommand(dotFile, outputFile)
+        val dotCommand = getDotCommand(inputDotFile.get().asFile, outputImageFile.get().asFile)
 
         ProcessBuilder(dotCommand)
             .redirectOutput(ProcessBuilder.Redirect.PIPE)

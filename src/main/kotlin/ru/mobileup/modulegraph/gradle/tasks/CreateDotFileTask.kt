@@ -24,18 +24,15 @@ abstract class CreateDotFileTask : DefaultTask() {
     private fun getModuleString(module: Module) = "${module.id}\n"
 
     @InputFile
-    val moduleDependenciesJsonFile: RegularFileProperty = project.objects.fileProperty()
+    val inputJsonFile: RegularFileProperty = project.objects.fileProperty()
 
     @OutputFile
     val outputDotFile: RegularFileProperty = project.objects.fileProperty()
 
     @TaskAction
     fun run() {
-        val modulesFile = moduleDependenciesJsonFile.get().asFile
-        val outputDotFile = outputDotFile.get().asFile
-        val modules = prepareInput(modulesFile)
-
-        writeDotFile(outputDotFile, modules)
+        val modules = prepareInput(inputJsonFile.get().asFile)
+        writeDotFile(outputDotFile.get().asFile, modules)
     }
 
     private fun writeDotFile(
