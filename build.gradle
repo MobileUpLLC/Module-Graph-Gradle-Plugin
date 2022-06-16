@@ -1,0 +1,47 @@
+buildscript {
+    ext.kotlinVersion = '1.6.21'
+
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+        classpath "org.jetbrains.kotlin:kotlin-serialization:1.6.21"
+        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0"
+        classpath("org.jetbrains.dokka:dokka-gradle-plugin:1.6.21")
+    }
+}
+
+apply plugin: 'kotlin'
+apply plugin: 'org.jetbrains.kotlin.plugin.serialization'
+apply plugin: 'java-gradle-plugin'
+apply plugin: 'io.codearte.nexus-staging'
+apply plugin: 'org.jetbrains.dokka'
+
+repositories {
+    google()
+    mavenCentral()
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3"
+    implementation "com.google.code.gson:gson:2.8.6"
+    implementation "junit:junit:4.12"
+}
+
+group = 'ru.mobileup'
+version = '1.0.0'
+
+gradlePlugin {
+    plugins {
+        moduleGraph {
+            id = 'ru.mobileup.module-graph'
+            implementationClass = 'ru.mobileup.modulegraph.gradle.ModuleGraphPlugin'
+        }
+    }
+}
+
+apply from: 'publish.gradle'
