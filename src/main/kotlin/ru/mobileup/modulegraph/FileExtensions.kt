@@ -11,17 +11,17 @@ fun Path.createPathIfNotExist() {
 }
 
 fun File.processFilesFromFolder(actionOnFile: (file: File) -> Boolean): Boolean {
-    val folderEntries = listFiles()
-    var interrupt = false
-    folderEntries?.forEach { entry ->
+    listFiles()?.forEach { entry ->
         when {
-            interrupt -> return true
-            entry.isDirectory -> interrupt = entry.processFilesFromFolder(actionOnFile)
+            entry.isDirectory -> {
+                val interrupt = entry.processFilesFromFolder(actionOnFile)
+                if (interrupt) return true
+            }
             else -> {
-                val actionInterrupt = actionOnFile.invoke(entry)
-                if (actionInterrupt) return true
+                val interrupt = actionOnFile.invoke(entry)
+                if (interrupt) return true
             }
         }
     }
-    return interrupt
+    return false
 }

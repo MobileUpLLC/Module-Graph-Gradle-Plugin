@@ -19,16 +19,20 @@ import java.nio.file.Files
 
 abstract class ParseModuleDependenciesTask : DefaultTask() {
 
-    private fun getImportString(module: Module) = "import ${applicationId.get()}.${module.id}"
+    private fun getImportString(module: Module) = "import ${featuresPackage.get()}.${module.id}"
 
     @InputDirectory
     val featuresDirectory: DirectoryProperty = project.objects.directoryProperty()
 
     @Input
-    val applicationId: Property<String> = project.objects.property(String::class.java)
+    val featuresPackage: Property<String> = project.objects.property(String::class.java)
 
     @OutputFile
     val outputJsonFile: RegularFileProperty = project.objects.fileProperty()
+
+    private val jsonFormatter = Json {
+        prettyPrint = true
+    }
 
     @TaskAction
     fun run() {
@@ -44,7 +48,7 @@ abstract class ParseModuleDependenciesTask : DefaultTask() {
     }
 
     private fun prepareOutput(modules: Set<Module>) {
-        val json = Json.encodeToString(modules)
+        val json = jsonFormatter.encodeToString(modules)
         val resultPath = outputJsonFile.get().asFile.toPath()
         resultPath.createPathIfNotExist()
         Files.writeString(resultPath, json)
