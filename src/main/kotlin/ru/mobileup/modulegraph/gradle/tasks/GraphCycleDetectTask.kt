@@ -19,7 +19,7 @@ abstract class GraphCycleDetectTask : DefaultTask() {
     @get: Input
     @set: Option(
         option = "ignore",
-        description = "Ignoring cycle and don't throw an exception if it find"
+        description = "Ignoring cycle and don't throw an exception if it is found"
     )
     var ignoreCycle: Boolean = false
 
@@ -43,7 +43,7 @@ abstract class GraphCycleDetectTask : DefaultTask() {
     private fun getErrorMessage(cycles: Set<String>): String {
         var errorMessage = "There are 1 or more cycles in the Dependency Graph \n"
         cycles.forEach {
-            errorMessage += "Cycle detect at: $it\n"
+            errorMessage += "Cycle is detected at: $it\n"
         }
         return errorMessage
     }
