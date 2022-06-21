@@ -6,6 +6,7 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import ru.mobileup.modulegraph.gradle.tasks.CreateDotFileTask
 import ru.mobileup.modulegraph.gradle.tasks.GenerateGraphImageTask
+import ru.mobileup.modulegraph.gradle.tasks.GraphCycleDetectTask
 import ru.mobileup.modulegraph.gradle.tasks.ParseModuleDependenciesTask
 
 @Suppress("LeakingThis")
@@ -36,6 +37,7 @@ class ModuleGraphPlugin : Plugin<Project> {
         internal const val PARSE_MODULE_DEPENDENCIES_TASK_NAME = "parseModuleDependencies"
         internal const val GENERATE_DOT_FILE_TASK_NAME = "generateDotFile"
         internal const val GENERATE_IMAGE_FILE_TASK_NAME = "generateModuleGraph"
+        internal const val GRAPH_CYCLE_DETECT_TASK_NAME = "detectGraphCycle"
         internal const val EXTENSION_NAME = "moduleGraph"
     }
 
@@ -60,6 +62,11 @@ class ModuleGraphPlugin : Plugin<Project> {
             GenerateGraphImageTask::class.java
         )
 
+        val task4 = project.tasks.register(
+            GRAPH_CYCLE_DETECT_TASK_NAME,
+            GraphCycleDetectTask::class.java
+        )
+
         task1.configure { task ->
             task.featuresDirectory.set(extension.featuresDirectory)
             task.featuresPackage.set(extension.featuresPackage)
@@ -74,6 +81,10 @@ class ModuleGraphPlugin : Plugin<Project> {
         task3.configure { task ->
             task.inputDotFile.set(task2.flatMap { it.outputDotFile })
             task.outputImageFile.set(extension.outputDirectory.file(extension.resultImageFileName))
+        }
+
+        task4.configure { task ->
+            task.inputDotFile.set(task2.flatMap { it.outputDotFile })
         }
     }
 }
