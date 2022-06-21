@@ -6,7 +6,7 @@ Gradle plugin for creating a dependency diagram graph of package-modules. It loo
 
 ## Usage
 
-1) Add dependency to project build.gradle
+1) Add dependency to root build.gradle
 ```kotlin
 plugins {
     id("ru.mobileup.module-graph") version "1.1.0" apply false
