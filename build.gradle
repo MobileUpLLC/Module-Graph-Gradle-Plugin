@@ -23,7 +23,6 @@ apply plugin: 'org.jetbrains.dokka'
 repositories {
     google()
     mavenCentral()
-    maven { url "https://jitpack.io" }
 }
 
 dependencies {
