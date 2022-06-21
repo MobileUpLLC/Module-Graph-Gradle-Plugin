@@ -1,14 +1,15 @@
-# Code Quality for Android
+# Module Graph Gradle Plugin
+[![Maven Central](https://img.shields.io/maven-central/v/ru.mobileup/module-graph)](https://repo1.maven.org/maven2/ru/mobileup/module-graph)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Gradle plugin for creating a dependency diagram graph of package-modules. It looks for imports in nested packages and creates a .dot file which is used to generate the svg image of the graph using GraphViz.
+Gradle plugin for creating a dependency diagram graph of package-modules. It looks for imports in nested packages and creates a .dot file which is used to generate the png image of the graph.
 
 ## Usage
 
-1) Add dependency
+1) Add dependency to project build.gradle
 ```kotlin
 plugins {
-    id("ru.mobileup.modulegraph") version "1.0.0"
+    id("ru.mobileup.module-graph") version "1.1.0" apply false
 }
 buildscript {
     repositories {
@@ -17,16 +18,20 @@ buildscript {
 }
 ```
 
-2) Setup plugin
+2) Setup plugin at features build.gradle
 ```kotlin
+plugins {
+    id("ru.mobileup.module-graph")
+}
+
 moduleGraph {
-    featuresPackage = 'com.domain.package'
-    featuresDirectory = project.file('src/main/kotlin/com/domain/package')
-    outputDirectory = project.file('module_graph')
+    featuresPackage = "com.domain.package"
+    featuresDirectory = project.file("src/main/kotlin/com/domain/package")
+    outputDirectory = project.file("module_graph")
 }
 ```
 
-3) To generate dependencies graph Run `gradlew generateModuleGraph`.
+3) To generate dependencies graph run `gradlew generateModuleGraph`.
 
 4) To detekt dependency cycles run `gradlew detektCycle`
 
