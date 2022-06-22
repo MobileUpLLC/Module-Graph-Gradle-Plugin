@@ -6,14 +6,14 @@ Gradle plugin for creating a dependency diagram graph of package-modules. It loo
 
 ## Notice
 
-Using Module Graph Gradle Plugin with Android Gradle Plugin version below 7.2.0 may cause some errors with JetPack DataBindings.
+Using Module Graph Gradle Plugin with Android Gradle Plugin version below 7.2.0 may cause some errors with JetPack Data Binding Library.
 
 ## Usage
 
 1) Add dependency to root build.gradle
 ```kotlin
 plugins {
-    id("ru.mobileup.module-graph") version "1.1.0" apply false
+    id("ru.mobileup.module-graph") version "1.1.1" apply false
 }
 buildscript {
     repositories {

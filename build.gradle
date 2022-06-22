@@ -28,8 +28,7 @@ repositories {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3"
-    // Required for jgrapht to work with AGP < 7.2.0
-    implementation "org.antlr:antlr4:4.8-1"
+    implementation "org.antlr:antlr4:4.8-1" // Required for jgrapht to work with AGP < 7.2.0
     implementation "org.jgrapht:jgrapht-core:1.5.1"
     implementation "org.jgrapht:jgrapht-ext:1.5.1"
     implementation "org.jgrapht:jgrapht-io:1.5.1"
@@ -37,7 +36,7 @@ dependencies {
 }
 
 group = 'ru.mobileup'
-version = '1.1.2'
+version = '1.1.1'
 
 gradlePlugin {
     plugins {
