@@ -28,9 +28,8 @@ class PluginTest {
         setupSettingsGradleFile()
 
         gradleRunner = GradleRunner.create()
-            .withPluginClasspath()
             .withProjectDir(testProjectDir.root)
-            .withTestKitDir(testProjectDir.newFolder())
+            .withPluginClasspath()
     }
 
     private fun setupBuildGradleFile(){
@@ -40,6 +39,7 @@ class PluginTest {
         plugins {
             id("ru.mobileup.module-graph")
         }
+        
     """.trimIndent())
 
         buildFile.appendText("""
