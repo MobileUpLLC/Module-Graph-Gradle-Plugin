@@ -1,22 +1,16 @@
 package ru.mobileup.modulegraph.gradle.tasks
 
-import com.mxgraph.layout.mxCircleLayout
-import com.mxgraph.layout.mxIGraphLayout
-import com.mxgraph.util.mxCellRenderer
+import guru.nidi.graphviz.engine.Format
+import guru.nidi.graphviz.engine.Graphviz
+import guru.nidi.graphviz.model.MutableGraph
+import guru.nidi.graphviz.parse.Parser
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import org.jgrapht.Graph
-import org.jgrapht.ext.JGraphXAdapter
-import org.jgrapht.graph.DirectedPseudograph
-import org.jgrapht.nio.dot.DOTImporter
-import ru.mobileup.modulegraph.graph.NamelessEdge
-import java.awt.Color
-import java.awt.image.BufferedImage
 import java.io.File
-import javax.imageio.ImageIO
+import java.io.IOException
 
 abstract class GenerateGraphImageTask : DefaultTask() {
 
@@ -32,30 +26,15 @@ abstract class GenerateGraphImageTask : DefaultTask() {
         exportGraphToPNG(graph, outputImageFile.get().asFile)
     }
 
-    private fun exportGraphToPNG(graph: Graph<String, NamelessEdge>, outputFile: File) {
-        val graphAdapter: JGraphXAdapter<String, NamelessEdge> = JGraphXAdapter(graph)
-        val layout: mxIGraphLayout = mxCircleLayout(graphAdapter)
-        layout.execute(graphAdapter.defaultParent)
-
-        val image: BufferedImage = mxCellRenderer.createBufferedImage(
-            graphAdapter,
-            null,
-            2.0,
-            Color.WHITE,
-            true,
-            null
-        )
-
-        ImageIO.write(image, "PNG", outputFile)
+    private fun exportGraphToPNG(graph: MutableGraph, outputFile: File) {
+        Graphviz.fromGraph(graph).render(Format.PNG).toFile(outputFile)
     }
 
-    private fun importGraphByDot(file: File): Graph<String, NamelessEdge> {
-        val graph: Graph<String, NamelessEdge> = DirectedPseudograph(NamelessEdge::class.java)
-        val importer = DOTImporter<String, NamelessEdge>()
-
-        importer.setVertexFactory { id -> id }
-        importer.importGraph(graph, file)
-
-        return graph
+    private fun importGraphByDot(file: File): MutableGraph {
+        return try {
+            Parser().read(file)
+        } catch (exception: IOException) {
+            throw IOException("Can't parse graph from file: ${file.path}", exception)
+        }
     }
 }
