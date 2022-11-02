@@ -6,10 +6,6 @@ import org.junit.rules.TemporaryFolder
 import java.io.File
 import java.nio.file.Paths
 
-/**
- * ###Warning:
- * TemporaryFolder Rule don't delete all temp file at TestEnvironment directory
- */
 class PluginTest {
     private val relativePathToTestEnvironment = "src/test/kotlin/test_env"
     private val relativePathToFeaturesDirectory: String = "../features"
