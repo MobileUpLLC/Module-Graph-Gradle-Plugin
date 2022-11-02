@@ -1,6 +1,9 @@
 package ru.mobileup.modulegraph
 
+import guru.nidi.graphviz.model.MutableGraph
+import guru.nidi.graphviz.parse.Parser
 import java.io.File
+import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -26,12 +29,10 @@ fun File.processFilesFromFolder(actionOnFile: (file: File) -> Boolean): Boolean 
     return false
 }
 
-//fun File.importGraphByDot(): Graph<String, NamelessEdge> {
-//    val graph: Graph<String, NamelessEdge> = DirectedPseudograph(NamelessEdge::class.java)
-//    val importer = DOTImporter<String, NamelessEdge>()
-//
-//    importer.setVertexFactory { id -> id }
-//    importer.importGraph(graph, this)
-//
-//    return graph
-//}
+fun File.importGraphByDot(): MutableGraph {
+    return try {
+        Parser().read(this)
+    } catch (exception: IOException) {
+        throw IOException("Can't parse graph from file: ${this.path}", exception)
+    }
+}
