@@ -64,5 +64,16 @@ class PluginTest {
         val result = gradleRunner
             .withArguments("generateModuleGraph")
             .build()
+
+        println(result.output)
+    }
+
+    @Test
+    fun `run detektCycle task without errors`() {
+        val result = gradleRunner
+            .withArguments("detectGraphCycle")
+            .build()
+
+        println(result.output)
     }
 }
