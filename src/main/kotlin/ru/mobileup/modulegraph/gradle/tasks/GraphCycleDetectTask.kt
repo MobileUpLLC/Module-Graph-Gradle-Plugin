@@ -29,18 +29,18 @@ abstract class GraphCycleDetectTask : DefaultTask() {
     fun run() {
         val graph = inputDotFile.get().asFile.importGraphByDot()
         val cycles = checker.check(graph.rootNodes())
-        val errorMessage = getErrorMessage(cycles)
-        if (!ignoreCycle) throw IllegalStateException(errorMessage)
-        else println(errorMessage)
+        val message = getMessage(cycles)
+        if (!ignoreCycle && cycles.size > 0) throw IllegalStateException(message)
+        else println(message)
     }
 
 
-    private fun getErrorMessage(cycles: ArrayList<LinkedList<LinkSource>>): String {
+    private fun getMessage(cycles: ArrayList<LinkedList<LinkSource>>): String {
         var errorMessage = "There are ${cycles.size} cycles in the Dependency Graph \n"
 
         cycles.forEach { path ->
             errorMessage += "Cycle path: "
-            path.forEach { errorMessage += " -> ${it.name()}" }
+            path.forEach { errorMessage += " <- ${it.name()}" }
             errorMessage += "\n"
         }
         return errorMessage
