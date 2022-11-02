@@ -1,11 +1,15 @@
 package ru.mobileup.modulegraph.gradle.tasks
 
+import guru.nidi.graphviz.model.LinkSource
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
+import ru.mobileup.modulegraph.graph.GraphCycleChecker
+import ru.mobileup.modulegraph.importGraphByDot
+import java.util.*
 
 abstract class GraphCycleDetectTask : DefaultTask() {
 
@@ -18,28 +22,26 @@ abstract class GraphCycleDetectTask : DefaultTask() {
         description = "Ignoring cycle and don't throw an exception if it is found"
     )
     var ignoreCycle: Boolean = false
+    private val checker = GraphCycleChecker()
+
 
     @TaskAction
     fun run() {
-        val graph = inputDotFile.get().asFile //.importGraphByDot()
-//        checkCycles(graph)
+        val graph = inputDotFile.get().asFile.importGraphByDot()
+        val cycles = checker.check(graph.rootNodes())
+        val errorMessage = getErrorMessage(cycles)
+        if (!ignoreCycle) throw IllegalStateException(errorMessage)
+        else println(errorMessage)
     }
 
-    @Throws(IllegalStateException::class)
-//    private fun checkCycles(graph: Graph<String, NamelessEdge>) {
-//        val cycleDetector: CycleDetector<String, NamelessEdge> = CycleDetector(graph)
-//        if (cycleDetector.detectCycles()) {
-//            val cycles = cycleDetector.findCycles()
-//            val errorMessage = getErrorMessage(cycles)
-//            if (!ignoreCycle) throw IllegalStateException(errorMessage)
-//            else println(errorMessage)
-//        }
-//    }
 
-    private fun getErrorMessage(cycles: Set<String>): String {
-        var errorMessage = "There are 1 or more cycles in the Dependency Graph \n"
-        cycles.forEach {
-            errorMessage += "Cycle is detected at: $it\n"
+    private fun getErrorMessage(cycles: ArrayList<LinkedList<LinkSource>>): String {
+        var errorMessage = "There are ${cycles.size} cycles in the Dependency Graph \n"
+
+        cycles.forEach { path ->
+            errorMessage += "Cycle path: "
+            path.forEach { errorMessage += " -> ${it.name()}" }
+            errorMessage += "\n"
         }
         return errorMessage
     }
