@@ -1,3 +1,5 @@
+package test_env
+
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.Before
 import org.junit.Rule
