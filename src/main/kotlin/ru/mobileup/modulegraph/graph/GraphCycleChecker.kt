@@ -36,16 +36,8 @@ class GraphCycleChecker {
                 return
             }
             NodeState.NOW_VISITING -> {
-                val path = LinkedList<LinkSource>()
-                val stackLast = cycleStack.removeLastOrNull() ?: return
-                path.add(stackLast)
-
-                do {
-                    val stackNode = cycleStack.removeLastOrNull() ?: return
-                    path.add(stackNode)
-
-                } while (stackNode != stackLast)
-
+                val path = getPath(cycleStack)
+                if (path.isEmpty()) return
                 paths.add(path)
                 stack.removeLastOrNull()
                 return
@@ -59,7 +51,20 @@ class GraphCycleChecker {
         visited[node] = NodeState.VISITED
     }
 
-    enum class NodeState {
+    private fun getPath(cycleStack: ArrayDeque<LinkSource>): LinkedList<LinkSource> {
+        val path = LinkedList<LinkSource>()
+        val stackLast = cycleStack.removeLastOrNull() ?: return path
+        path.add(stackLast)
+
+        do {
+            val stackNode = cycleStack.removeLastOrNull() ?: return path
+            path.add(stackNode)
+        } while (stackNode != stackLast)
+
+        return path
+    }
+
+    private enum class NodeState {
         NOT_VISITED, VISITED, NOW_VISITING
     }
 }

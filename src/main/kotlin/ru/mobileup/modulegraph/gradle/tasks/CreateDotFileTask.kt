@@ -16,12 +16,15 @@ import java.nio.file.StandardOpenOption
 
 abstract class CreateDotFileTask : DefaultTask() {
 
-    private val dotFileStartString = "digraph {\n"
-    private val dotFileEndString = "}\n"
-    private fun getDependencyString(module: Module, dependencyModule: DependencyModule) =
-        "${module.id} -> ${dependencyModule.id}\n"
+    companion object{
+        private const val dotFileStartString = "digraph {\n"
+        private const val dotFileEndString = "}\n"
 
-    private fun getModuleString(module: Module) = "${module.id}\n"
+        private fun getModuleString(module: Module) = "${module.id}\n"
+        private fun getDependencyString(module: Module, dependencyModule: DependencyModule) =
+            "${module.id} -> ${dependencyModule.id}\n"
+
+    }
 
     @InputFile
     val inputJsonFile: RegularFileProperty = project.objects.fileProperty()
