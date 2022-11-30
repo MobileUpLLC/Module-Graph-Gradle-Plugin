@@ -2,7 +2,7 @@
 [![Maven Central](https://img.shields.io/maven-central/v/ru.mobileup/module-graph)](https://repo1.maven.org/maven2/ru/mobileup/module-graph)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Gradle plugin for creating a dependency diagram graph of package-modules. It looks for imports in nested packages and creates a .dot file which is used to generate the png image of the graph.
+Gradle plugin for creating a dependency diagram graph of package-modules. It looks for imports in nested packages and creates a .dot file which is used to generate the png image of the graph. You can also check the dependency graph for cycles. 
 
 ## Notice
 
@@ -37,7 +37,7 @@ moduleGraph {
 
 3) To generate dependencies graph run `gradlew generateModuleGraph`.
 
-4) To detekt dependency cycles run `gradlew detektCycle`
+4) To detect dependency cycles run `gradlew detectGraphCycle`
 
 ## License
 ```
