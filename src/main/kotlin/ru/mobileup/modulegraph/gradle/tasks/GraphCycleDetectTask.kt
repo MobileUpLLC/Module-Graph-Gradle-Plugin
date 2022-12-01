@@ -18,10 +18,10 @@ abstract class GraphCycleDetectTask : DefaultTask() {
 
     @get: Input
     @set: Option(
-        option = "ignore",
-        description = "Ignoring cycle and don't throw an exception if it is found"
+        option = "minCycles",
+        description = "Do not throw an exception if the number of cycles found is less than or equal to minCycle."
     )
-    var ignoreCycle: Boolean = false
+    var minCycles: Int = 0
     private val checker = GraphCycleChecker()
 
 
@@ -30,7 +30,7 @@ abstract class GraphCycleDetectTask : DefaultTask() {
         val graph = inputDotFile.get().asFile.importGraphByDot()
         val cycles = checker.check(graph.rootNodes())
         val message = getMessage(cycles)
-        if (!ignoreCycle && cycles.size > 0) throw IllegalStateException(message)
+        if (minCycles < cycles.size) throw IllegalStateException(message)
         else println(message)
     }
 
