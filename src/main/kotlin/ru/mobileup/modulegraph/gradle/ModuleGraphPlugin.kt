@@ -37,7 +37,7 @@ class ModuleGraphPlugin : Plugin<Project> {
         internal const val PARSE_MODULE_DEPENDENCIES_TASK_NAME = "parseModuleDependencies"
         internal const val GENERATE_DOT_FILE_TASK_NAME = "generateDotFile"
         internal const val GENERATE_IMAGE_FILE_TASK_NAME = "generateModuleGraph"
-        internal const val GRAPH_CYCLE_DETECT_TASK_NAME = "detectGraphCycle"
+        internal const val GRAPH_CYCLE_DETECT_TASK_NAME = "detectGraphCycles"
         internal const val EXTENSION_NAME = "moduleGraph"
     }
 

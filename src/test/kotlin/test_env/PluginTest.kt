@@ -69,7 +69,7 @@ class PluginTest {
     @Test
     fun `run detektCycle task without errors`() {
         val result = gradleRunner
-            .withArguments("detectGraphCycle")
+            .withArguments("detectGraphCycles")
             .build()
 
         println(result.output)

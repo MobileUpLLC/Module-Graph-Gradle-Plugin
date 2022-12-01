@@ -37,7 +37,7 @@ moduleGraph {
 
 3) To generate dependencies graph run `gradlew generateModuleGraph`.
 
-4) To detect dependency cycles run `gradlew detectGraphCycle`
+4) To detect dependency cycles run `gradlew detectGraphCycles`
 
 ## License
 ```
