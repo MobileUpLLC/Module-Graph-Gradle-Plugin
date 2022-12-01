@@ -1,5 +1,6 @@
 package ru.mobileup.modulegraph
 
+import guru.nidi.graphviz.engine.Format
 import guru.nidi.graphviz.model.MutableGraph
 import guru.nidi.graphviz.parse.Parser
 import java.io.File
@@ -34,5 +35,13 @@ fun File.importGraphByDot(): MutableGraph {
         Parser().read(this)
     } catch (exception: IOException) {
         throw IOException("Can't parse graph from file: ${this.path}", exception)
+    }
+}
+
+fun File.getImageFileFormat(): Format {
+    return when (extension) {
+        "svg" -> Format.SVG
+        "png" -> Format.PNG
+        else -> throw IllegalArgumentException("Unknown image format $extension")
     }
 }
