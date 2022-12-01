@@ -4,9 +4,9 @@ import guru.nidi.graphviz.model.LinkSource
 import java.util.*
 import kotlin.collections.ArrayDeque
 
-class GraphCycleChecker {
+class GraphCycleDetector {
 
-    fun check(nodes: Collection<LinkSource>): ArrayList<LinkedList<LinkSource>> {
+    fun detect(nodes: Collection<LinkSource>): ArrayList<LinkedList<LinkSource>> {
         val visited = mutableMapOf<LinkSource, NodeState>()
         val stack = ArrayDeque<LinkSource>()
         val paths = ArrayList<LinkedList<LinkSource>>()

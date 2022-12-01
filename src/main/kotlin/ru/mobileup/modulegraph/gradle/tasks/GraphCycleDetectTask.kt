@@ -7,7 +7,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
-import ru.mobileup.modulegraph.graph.GraphCycleChecker
+import ru.mobileup.modulegraph.graph.GraphCycleDetector
 import ru.mobileup.modulegraph.importGraphByDot
 import java.util.*
 
@@ -22,13 +22,13 @@ abstract class GraphCycleDetectTask : DefaultTask() {
         description = "Do not throw an exception if the number of cycles found is less than or equal to minCycle."
     )
     var minCycles: Int = 0
-    private val checker = GraphCycleChecker()
+    private val detector = GraphCycleDetector()
 
 
     @TaskAction
     fun run() {
         val graph = inputDotFile.get().asFile.importGraphByDot()
-        val cycles = checker.check(graph.rootNodes())
+        val cycles = detector.detect(graph.rootNodes())
         val message = getMessage(cycles)
         if (minCycles < cycles.size) throw IllegalStateException(message)
         else println(message)
