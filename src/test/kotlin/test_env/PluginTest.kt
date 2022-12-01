@@ -10,51 +10,26 @@ import java.nio.file.Paths
 
 class PluginTest {
     private val relativePathToTestEnvironment = "src/test/kotlin/test_env"
-    private val relativePathToFeaturesDirectory: String = "../features"
-    private val relativePathToOutputDirectory: String = "../outputs"
-    private val testEnvironmentFolder = Paths.get(relativePathToTestEnvironment).toAbsolutePath().toFile()
+    private val pathToBuildGradleFile: String = "$relativePathToTestEnvironment/gradle/build.gradle"
+    private val pathToSettingsGradleFile: String =
+        "$relativePathToTestEnvironment/gradle/settings.gradle"
+    private val testEnvironmentFolder =
+        Paths.get(relativePathToTestEnvironment).toAbsolutePath().toFile()
 
     @get:Rule
     var testProjectDir = TemporaryFolder(testEnvironmentFolder)
-    private lateinit var buildFile: File
-    private lateinit var settingsFile: File
+    private var buildFile: File = File(pathToBuildGradleFile)
+    private var settingsFile: File = File(pathToSettingsGradleFile)
     private lateinit var gradleRunner: GradleRunner
 
     @Before
     fun setup() {
-        setupBuildGradleFile()
-        setupSettingsGradleFile()
+        buildFile.copyTo(testProjectDir.newFile("build.gradle"), true)
+        settingsFile.copyTo(testProjectDir.newFile("settings.gradle"), true)
 
         gradleRunner = GradleRunner.create()
             .withProjectDir(testProjectDir.root)
             .withPluginClasspath()
-    }
-
-    private fun setupBuildGradleFile(){
-        buildFile = testProjectDir.newFile("build.gradle")
-
-        buildFile.appendText("""
-        plugins {
-            id("ru.mobileup.module-graph")
-        }
-        
-    """.trimIndent())
-
-        buildFile.appendText("""
-            moduleGraph {
-                featuresPackage = "test_env.features"
-                featuresDirectory = project.file("$relativePathToFeaturesDirectory")
-                outputDirectory = project.file("$relativePathToOutputDirectory")
-            }
-        """.trimIndent())
-    }
-
-    private fun setupSettingsGradleFile(){
-        settingsFile = testProjectDir.newFile("settings.gradle")
-
-        settingsFile.appendText("""
-            rootProject.name = "module-graph"
-        """.trimIndent())
     }
 
     @Test
@@ -70,8 +45,8 @@ class PluginTest {
     fun `run detektCycle task without errors`() {
         val result = gradleRunner
             .withArguments("detectGraphCycles")
+            .withArguments("-PminCycles=2")
             .build()
-
         println(result.output)
     }
 }
