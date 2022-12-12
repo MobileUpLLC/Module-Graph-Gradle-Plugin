@@ -3,34 +3,37 @@ package ru.mobileup.modulegraph.graph
 import guru.nidi.graphviz.model.LinkSource
 import java.util.*
 import kotlin.collections.ArrayDeque
+import kotlin.collections.HashMap
 
 class GraphCycleDetector {
 
-    fun detect(nodes: Collection<LinkSource>): ArrayList<LinkedList<LinkSource>> {
+    fun detect(nodes: Collection<LinkSource>): List<LinkedList<LinkSource>> {
         val visited = mutableMapOf<LinkSource, NodeState>()
-        val stack = ArrayDeque<LinkSource>()
         val paths = ArrayList<LinkedList<LinkSource>>()
         val cycleStack = ArrayDeque<LinkSource>()
 
-        nodes.forEach {
-            dfsSearch(it, stack, visited, paths, cycleStack)
+        nodes.forEach { node ->
+            dfsSearch(node, visited, paths, cycleStack)
             cycleStack.clear()
+            visited.forEach { entry ->
+                if (entry.value == NodeState.NOW_VISITING) visited[entry.key] = NodeState.VISITED
+            }
         }
-        return paths
+        return paths.distinct()
     }
 
+
     private fun dfsSearch(
-        node: LinkSource,
-        stack: ArrayDeque<LinkSource>,
-        visited: MutableMap<LinkSource, NodeState>,
-        paths: ArrayList<LinkedList<LinkSource>>,
+        currentNode: LinkSource,
+        visitedMap: MutableMap<LinkSource, NodeState>,
+        cyclePaths: ArrayList<LinkedList<LinkSource>>,
         cycleStack: ArrayDeque<LinkSource>
     ) {
-        cycleStack.add(node)
+        cycleStack.add(currentNode)
 
-        when (visited[node]) {
+        when (visitedMap[currentNode]) {
             NodeState.NOT_VISITED, null -> {
-                visited[node] = NodeState.NOW_VISITING
+                visitedMap[currentNode] = NodeState.NOW_VISITING
             }
             NodeState.VISITED -> {
                 return
@@ -38,17 +41,22 @@ class GraphCycleDetector {
             NodeState.NOW_VISITING -> {
                 val path = getPath(cycleStack)
                 if (path.isEmpty()) return
-                paths.add(path)
-                stack.removeLastOrNull()
+                cyclePaths.add(path)
                 return
             }
         }
 
-        stack.addAll(node.links().map { it.to().asLinkSource() })
+        val stack = ArrayDeque<LinkSource>()
+        stack.addAll(currentNode.links().map { it.to().asLinkSource() })
 
-        val newNode = stack.removeLastOrNull() ?: return
-        dfsSearch(newNode, stack, visited, paths, cycleStack)
-        visited[node] = NodeState.VISITED
+
+        while (stack.isNotEmpty()) {
+            val cycleStackCopy = ArrayDeque(cycleStack)
+            val visitedMapCopy = HashMap(visitedMap)
+
+            val newNode = stack.removeLastOrNull() ?: return
+            dfsSearch(newNode, visitedMapCopy, cyclePaths, cycleStackCopy)
+        }
     }
 
     private fun getPath(cycleStack: ArrayDeque<LinkSource>): LinkedList<LinkSource> {
@@ -57,7 +65,7 @@ class GraphCycleDetector {
         path.add(stackLast)
 
         do {
-            val stackNode = cycleStack.removeLastOrNull() ?: return path
+            val stackNode = cycleStack.removeLastOrNull() ?: stackLast
             path.add(stackNode)
         } while (stackNode != stackLast)
 
