@@ -35,14 +35,20 @@ abstract class GraphCycleDetectTask : DefaultTask() {
     }
 
 
-    private fun getMessage(cycles: ArrayList<LinkedList<LinkSource>>): String {
+    private fun getMessage(cycles: List<LinkedList<LinkSource>>): String {
         var errorMessage = "There are ${cycles.size} cycles in the Dependency Graph \n"
 
         cycles.forEach { path ->
             errorMessage += "Cycle path: "
-            path.forEach { errorMessage += " <- ${it.name()}" }
+            errorMessage += path.getPathString()
             errorMessage += "\n"
         }
         return errorMessage
+    }
+
+    private fun LinkedList<LinkSource>.getPathString(): String {
+        var result = ""
+        forEach { result += " <- ${it.name()}" }
+        return result
     }
 }
