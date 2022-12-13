@@ -10,16 +10,11 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import ru.mobileup.modulegraph.Module
-import ru.mobileup.modulegraph.createPathIfNotExist
-import ru.mobileup.modulegraph.processFilesFromFolder
-import ru.mobileup.modulegraph.toDependency
+import ru.mobileup.modulegraph.*
 import java.io.File
 import java.nio.file.Files
 
 abstract class ParseModuleDependenciesTask : DefaultTask() {
-
-    private fun getImportString(module: Module) = "import ${featuresPackage.get()}.${module.id}"
 
     @InputDirectory
     val featuresDirectory: DirectoryProperty = project.objects.directoryProperty()
@@ -56,9 +51,7 @@ abstract class ParseModuleDependenciesTask : DefaultTask() {
 
     private fun getPackageModules(dir: File): Set<Module> {
         val set = mutableSetOf<Module>()
-        dir.listFiles()?.forEach { file ->
-            if (file.isDirectory) set.add(Module(file.name, file.path))
-        }
+        dir.getChildDirs()?.forEach { set.add(it.createModule()) }
         return set
     }
 
@@ -66,10 +59,10 @@ abstract class ParseModuleDependenciesTask : DefaultTask() {
      * Search dependencies to [modules] in [module]
      */
     private fun searchDependencies(module: Module, modules: Set<Module>) {
-        val file = File(module.path)
+        val file = File(module.getAbsolutePath())
         modules.forEach { other ->
             if (other.id != module.id) {
-                val import = getImportString(other)
+                val import = other.getImportString()
                 val result = checkImports(import, file)
                 if (result) module.dependency.add(other.toDependency())
             }
@@ -90,4 +83,9 @@ abstract class ParseModuleDependenciesTask : DefaultTask() {
         }
         return false
     }
+
+    private fun File.createModule() = Module(name, getFileRelativePath())
+    private fun Module.getImportString() = "import ${featuresPackage.get()}.${id}"
+    private fun File.getFileRelativePath() = "/${toRelativeString(featuresDirectory.get().asFile)}"
+    private fun Module.getAbsolutePath() = featuresDirectory.get().asFile.absolutePath + path
 }

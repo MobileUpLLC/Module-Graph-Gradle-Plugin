@@ -45,3 +45,5 @@ fun File.getImageFileFormat(): Format {
         else -> throw IllegalArgumentException("Unknown image format $extension")
     }
 }
+
+fun File.getChildDirs() = listFiles()?.filter { it.isDirectory }
