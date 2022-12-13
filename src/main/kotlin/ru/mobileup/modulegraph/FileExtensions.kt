@@ -1,10 +1,10 @@
 package ru.mobileup.modulegraph
 
-import org.jgrapht.Graph
-import org.jgrapht.graph.DirectedPseudograph
-import org.jgrapht.nio.dot.DOTImporter
-import ru.mobileup.modulegraph.graph.NamelessEdge
+import guru.nidi.graphviz.engine.Format
+import guru.nidi.graphviz.model.MutableGraph
+import guru.nidi.graphviz.parse.Parser
 import java.io.File
+import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -30,12 +30,18 @@ fun File.processFilesFromFolder(actionOnFile: (file: File) -> Boolean): Boolean 
     return false
 }
 
-fun File.importGraphByDot(): Graph<String, NamelessEdge> {
-    val graph: Graph<String, NamelessEdge> = DirectedPseudograph(NamelessEdge::class.java)
-    val importer = DOTImporter<String, NamelessEdge>()
+fun File.importGraphByDot(): MutableGraph {
+    return try {
+        Parser().read(this)
+    } catch (exception: IOException) {
+        throw IOException("Can't parse graph from file: ${this.path}", exception)
+    }
+}
 
-    importer.setVertexFactory { id -> id }
-    importer.importGraph(graph, this)
-
-    return graph
+fun File.getImageFileFormat(): Format {
+    return when (extension) {
+        "svg" -> Format.SVG
+        "png" -> Format.PNG
+        else -> throw IllegalArgumentException("Unknown image format $extension")
+    }
 }

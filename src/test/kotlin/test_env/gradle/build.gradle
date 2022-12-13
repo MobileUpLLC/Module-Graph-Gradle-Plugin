@@ -1,0 +1,9 @@
+plugins {
+    id("ru.mobileup.module-graph")
+}
+
+moduleGraph {
+    featuresPackage = "test_env.features"
+    featuresDirectory = project.file("../features")
+    outputDirectory = project.file("../outputs")
+}
