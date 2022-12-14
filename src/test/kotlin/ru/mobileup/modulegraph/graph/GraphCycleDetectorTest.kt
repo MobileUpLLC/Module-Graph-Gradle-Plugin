@@ -59,6 +59,42 @@ internal class GraphCycleDetectorTest {
 
         assert(cycles.size == 5)
     }
+
+    @Test
+    fun detectCycles7() {
+        val graph = Parser().read(dotDifferentCycles)
+        val detector = GraphCycleDetector()
+        val list = graph.rootNodes()
+
+        val cycles = detector.detect(list)
+
+        assert(cycles.size == 7)
+    }
+
+    @Test
+    fun detectOtherCycles7() {
+        val graph = Parser().read(dotDifferentCycles2)
+        val detector = GraphCycleDetector()
+        val list = graph.rootNodes()
+
+        val cycles = detector.detect(list)
+
+        assert(cycles.size == 7)
+    }
+
+    @Test
+    fun detectDifferentDotCycles() {
+        val graph = Parser().read(dotDifferentCycles)
+        val detector = GraphCycleDetector()
+        val list = graph.rootNodes()
+        val graph2 = Parser().read(dotDifferentCycles2)
+        val list2 = graph2.rootNodes()
+
+        val cycles = detector.detect(list)
+        val cycles2 = detector.detect(list2)
+
+        assert(cycles.size == cycles2.size)
+    }
 }
 
 
@@ -124,4 +160,84 @@ val dot5Cycles = """
         feature2 -> feature3
         feature3 -> cycle
     }
+""".trimIndent()
+
+val dotDifferentCycles = """
+digraph {
+followings
+discover
+author_flow
+profile
+photocard_flow
+root
+unsplash
+favorites_flow
+authorization
+photos
+collections
+feed_flow
+followings -> profile
+discover -> photocard_flow
+author_flow -> profile
+author_flow -> photocard_flow
+profile -> followings
+profile -> author_flow
+profile -> collections
+photocard_flow -> author_flow
+photocard_flow -> collections
+root -> unsplash
+root -> authorization
+unsplash -> discover
+unsplash -> profile
+unsplash -> favorites_flow
+unsplash -> authorization
+unsplash -> feed_flow
+favorites_flow -> photocard_flow
+favorites_flow -> photos
+photos -> profile
+collections -> profile
+collections -> photocard_flow
+feed_flow -> photocard_flow
+feed_flow -> photos
+}
+""".trimIndent()
+
+val dotDifferentCycles2 = """
+digraph {
+authorization
+author_flow
+collections
+discover
+favorites_flow
+feed_flow
+followings
+photocard_flow
+photos
+profile
+root
+unsplash
+author_flow -> photocard_flow
+author_flow -> profile
+collections -> photocard_flow
+collections -> profile
+discover -> photocard_flow
+favorites_flow -> photocard_flow
+favorites_flow -> photos
+feed_flow -> photocard_flow
+feed_flow -> photos
+followings -> profile
+photocard_flow -> author_flow
+photocard_flow -> collections
+photos -> profile
+profile -> author_flow
+profile -> collections
+profile -> followings
+root -> authorization
+root -> unsplash
+unsplash -> authorization
+unsplash -> discover
+unsplash -> favorites_flow
+unsplash -> feed_flow
+unsplash -> profile
+}
 """.trimIndent()
