@@ -6,4 +6,5 @@ moduleGraph {
     featuresPackage = "test_env.features"
     featuresDirectory = project.file("../features")
     outputDirectory = project.file("../outputs")
+    minCycles = 1
 }

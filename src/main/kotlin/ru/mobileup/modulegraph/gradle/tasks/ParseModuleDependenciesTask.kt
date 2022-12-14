@@ -10,16 +10,11 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import ru.mobileup.modulegraph.Module
-import ru.mobileup.modulegraph.createPathIfNotExist
-import ru.mobileup.modulegraph.processFilesFromFolder
-import ru.mobileup.modulegraph.toDependency
+import ru.mobileup.modulegraph.*
 import java.io.File
 import java.nio.file.Files
 
 abstract class ParseModuleDependenciesTask : DefaultTask() {
-
-    private fun getImportString(module: Module) = "import ${featuresPackage.get()}.${module.id}"
 
     @InputDirectory
     val featuresDirectory: DirectoryProperty = project.objects.directoryProperty()
@@ -41,39 +36,40 @@ abstract class ParseModuleDependenciesTask : DefaultTask() {
         prepareOutput(modules)
     }
 
-    private fun findPackageModuleDependencies(files: File): Set<Module> {
+    private fun findPackageModuleDependencies(files: File): List<Module> {
         val modules = getPackageModules(files)
         modules.forEach { searchDependencies(it, modules) }
         return modules
     }
 
-    private fun prepareOutput(modules: Set<Module>) {
+    private fun prepareOutput(modules: List<Module>) {
         val json = jsonFormatter.encodeToString(modules)
         val resultPath = outputJsonFile.get().asFile.toPath()
         resultPath.createPathIfNotExist()
         Files.writeString(resultPath, json)
     }
 
-    private fun getPackageModules(dir: File): Set<Module> {
-        val set = mutableSetOf<Module>()
-        dir.listFiles()?.forEach { file ->
-            if (file.isDirectory) set.add(Module(file.name, file.path))
-        }
-        return set
+    private fun getPackageModules(dir: File): List<Module> {
+        val list = mutableListOf<Module>()
+        dir.getChildDirs()?.forEach { list.add(it.createModule()) }
+
+        return list.sortedBy { it.id }
     }
 
     /**
      * Search dependencies to [modules] in [module]
      */
-    private fun searchDependencies(module: Module, modules: Set<Module>) {
-        val file = File(module.path)
+    private fun searchDependencies(module: Module, modules: List<Module>) {
+        val file = File(module.getAbsolutePath())
+        val tempList = mutableListOf<DependencyModule>()
         modules.forEach { other ->
             if (other.id != module.id) {
-                val import = getImportString(other)
+                val import = other.getImportString()
                 val result = checkImports(import, file)
-                if (result) module.dependency.add(other.toDependency())
+                if (result) tempList.add(other.toDependency())
             }
         }
+        module.dependency.addAll(tempList.sortedBy { it.id })
     }
 
     private fun checkImports(import: String, dir: File): Boolean {
@@ -90,4 +86,9 @@ abstract class ParseModuleDependenciesTask : DefaultTask() {
         }
         return false
     }
+
+    private fun File.createModule() = Module(name, getFileRelativePath())
+    private fun Module.getImportString() = "import ${featuresPackage.get()}.${id}"
+    private fun File.getFileRelativePath() = "/${toRelativeString(featuresDirectory.get().asFile)}"
+    private fun Module.getAbsolutePath() = featuresDirectory.get().asFile.absolutePath + path
 }

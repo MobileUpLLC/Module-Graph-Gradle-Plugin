@@ -45,7 +45,6 @@ class PluginTest {
     fun `run detektCycle task without errors`() {
         val result = gradleRunner
             .withArguments("detectGraphCycles")
-            .withArguments("-PminCycles=2")
             .build()
         println(result.output)
     }
