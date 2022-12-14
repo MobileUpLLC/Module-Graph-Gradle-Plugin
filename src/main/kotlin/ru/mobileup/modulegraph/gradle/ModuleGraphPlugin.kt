@@ -14,6 +14,7 @@ abstract class ModuleGraphExtension {
     abstract val featuresPackage: Property<String>
     abstract val featuresDirectory: DirectoryProperty
     abstract val outputDirectory: DirectoryProperty
+    abstract val minCycles: Property<Int>
     abstract val resultJsonFileName: Property<String>
     abstract val resultDotFileName: Property<String>
     abstract val resultImageFileName: Property<String>
@@ -22,12 +23,14 @@ abstract class ModuleGraphExtension {
         private const val DEFAULT_RESULT_JSON_FILE_NAME = "modules.json"
         private const val DEFAULT_RESULT_DOT_FILE_NAME = "modules.dot"
         private const val DEFAULT_RESULT_IMAGE_FILE_NAME = "modules.png"
+        private const val DEFAULT_MIN_CYCLES = 0
     }
 
     init {
         resultJsonFileName.convention(DEFAULT_RESULT_JSON_FILE_NAME)
         resultDotFileName.convention(DEFAULT_RESULT_DOT_FILE_NAME)
         resultImageFileName.convention(DEFAULT_RESULT_IMAGE_FILE_NAME)
+        minCycles.convention(DEFAULT_MIN_CYCLES)
     }
 }
 
@@ -85,6 +88,7 @@ class ModuleGraphPlugin : Plugin<Project> {
 
         task4.configure { task ->
             task.inputDotFile.set(task2.flatMap { it.outputDotFile })
+            task.minCyclesProperty.set(extension.minCycles.get())
         }
     }
 }
