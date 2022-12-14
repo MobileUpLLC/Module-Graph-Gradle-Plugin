@@ -53,8 +53,9 @@ abstract class GraphCycleDetectTask : DefaultTask() {
     }
 
     private fun LinkedList<LinkSource>.getPathString(): String {
+        val separator = " <- "
         var result = ""
-        forEach { result += " <- ${it.name()}" }
-        return result
+        forEach { result += separator + it.name().toString() }
+        return result.replaceFirst(separator, "")
     }
 }
