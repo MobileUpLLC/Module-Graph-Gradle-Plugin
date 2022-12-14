@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class Module(
     val id: String,
     val path: String,
-    val dependency: MutableSet<DependencyModule> = mutableSetOf()
+    val dependency: MutableList<DependencyModule> = mutableListOf()
 )
 
 @Serializable

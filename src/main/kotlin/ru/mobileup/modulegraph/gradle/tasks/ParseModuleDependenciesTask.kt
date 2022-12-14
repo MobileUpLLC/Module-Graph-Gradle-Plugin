@@ -36,37 +36,40 @@ abstract class ParseModuleDependenciesTask : DefaultTask() {
         prepareOutput(modules)
     }
 
-    private fun findPackageModuleDependencies(files: File): Set<Module> {
+    private fun findPackageModuleDependencies(files: File): List<Module> {
         val modules = getPackageModules(files)
         modules.forEach { searchDependencies(it, modules) }
         return modules
     }
 
-    private fun prepareOutput(modules: Set<Module>) {
+    private fun prepareOutput(modules: List<Module>) {
         val json = jsonFormatter.encodeToString(modules)
         val resultPath = outputJsonFile.get().asFile.toPath()
         resultPath.createPathIfNotExist()
         Files.writeString(resultPath, json)
     }
 
-    private fun getPackageModules(dir: File): Set<Module> {
-        val set = mutableSetOf<Module>()
-        dir.getChildDirs()?.forEach { set.add(it.createModule()) }
-        return set
+    private fun getPackageModules(dir: File): List<Module> {
+        val list = mutableListOf<Module>()
+        dir.getChildDirs()?.forEach { list.add(it.createModule()) }
+
+        return list.sortedBy { it.id }
     }
 
     /**
      * Search dependencies to [modules] in [module]
      */
-    private fun searchDependencies(module: Module, modules: Set<Module>) {
+    private fun searchDependencies(module: Module, modules: List<Module>) {
         val file = File(module.getAbsolutePath())
+        val tempList = mutableListOf<DependencyModule>()
         modules.forEach { other ->
             if (other.id != module.id) {
                 val import = other.getImportString()
                 val result = checkImports(import, file)
-                if (result) module.dependency.add(other.toDependency())
+                if (result) tempList.add(other.toDependency())
             }
         }
+        module.dependency.addAll(tempList.sortedBy { it.id })
     }
 
     private fun checkImports(import: String, dir: File): Boolean {
