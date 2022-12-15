@@ -29,7 +29,11 @@ abstract class GenerateGraphImageTask : DefaultTask() {
 
     private fun exportGraphToImage(graph: MutableGraph, outputFile: File) {
         val format = outputFile.getImageFileFormat()
-        Graphviz.useEngine(GraphvizV8Engine(), GraphvizJdkEngine())
+        val resource = "com/eclipsesource/v8/V8.class"
+        val v8Url = Graphviz::class.java.classLoader.getResource(resource)
+        val engine = if (v8Url != null) GraphvizV8Engine() else GraphvizJdkEngine()
+
+        Graphviz.useEngine(engine)
         Graphviz.fromGraph(graph).render(format).toFile(outputFile)
     }
 }
