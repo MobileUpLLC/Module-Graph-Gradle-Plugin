@@ -1,0 +1,12 @@
+digraph {
+cycle
+feature1
+feature2
+feature3
+isolated
+cycle -> feature2
+feature1 -> cycle
+feature1 -> feature2
+feature2 -> feature3
+feature3 -> cycle
+}
