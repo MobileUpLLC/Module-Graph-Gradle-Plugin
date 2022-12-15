@@ -33,15 +33,15 @@ dependencies {
 
     switch (true) {
         case os.windows && arch.i386:
-            implementation "com.eclipsesource.j2v8:j2v8_win32_x86_64:4.6.0"
+            implementation "com.eclipsesource.j2v8:j2v8_win32_x86:4.6.0"
             break
         case os.windows && arch.amd64:
             implementation "com.eclipsesource.j2v8:j2v8_win32_x86_64:4.6.0"
             break
-        case os.macOsX:
+        case os.macOsX && arch.amd64:
             implementation "com.eclipsesource.j2v8:j2v8_macosx_x86_64:4.6.0"
             break
-        case os.linux:
+        case os.linux && arch.amd64:
             implementation "com.eclipsesource.j2v8:j2v8_linux_x86_64:4.8.0"
             break
         default:
