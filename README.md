@@ -4,16 +4,12 @@
 
 Gradle plugin for creating a dependency diagram graph of package-modules. It looks for imports in nested packages and creates a .dot file which is used to generate the png image of the graph. You can also check the dependency graph for cycles. 
 
-## Notice
-
-Using Module Graph Gradle Plugin with Android Gradle Plugin version below 7.2.0 may cause some errors with JetPack Data Binding Library.
-
 ## Usage
 
 1) Add dependency to root build.gradle
 ```kotlin
 plugins {
-    id("ru.mobileup.module-graph") version "1.1.1" apply false
+    id("ru.mobileup.module-graph") version "1.3.0" apply false
 }
 buildscript {
     repositories {
