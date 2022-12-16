@@ -1,0 +1,50 @@
+[
+    {
+        "id": "cycle",
+        "path": "/cycle",
+        "dependency": [
+            {
+                "id": "feature2",
+                "path": "/feature2"
+            }
+        ]
+    },
+    {
+        "id": "feature1",
+        "path": "/feature1",
+        "dependency": [
+            {
+                "id": "cycle",
+                "path": "/cycle"
+            },
+            {
+                "id": "feature2",
+                "path": "/feature2"
+            }
+        ]
+    },
+    {
+        "id": "feature2",
+        "path": "/feature2",
+        "dependency": [
+            {
+                "id": "feature3",
+                "path": "/feature3"
+            }
+        ]
+    },
+    {
+        "id": "feature3",
+        "path": "/feature3",
+        "dependency": [
+            {
+                "id": "cycle",
+                "path": "/cycle"
+            }
+        ]
+    },
+    {
+        "id": "isolated",
+        "path": "/isolated"
+    }
+]

@@ -1,6 +1,7 @@
 package ru.mobileup.modulegraph.gradle.tasks
 
 import guru.nidi.graphviz.engine.Graphviz
+import guru.nidi.graphviz.engine.GraphvizJdkEngine
 import guru.nidi.graphviz.engine.GraphvizV8Engine
 import guru.nidi.graphviz.model.MutableGraph
 import org.gradle.api.DefaultTask
@@ -28,7 +29,11 @@ abstract class GenerateGraphImageTask : DefaultTask() {
 
     private fun exportGraphToImage(graph: MutableGraph, outputFile: File) {
         val format = outputFile.getImageFileFormat()
-        Graphviz.useEngine(GraphvizV8Engine())
+        val resource = "com/eclipsesource/v8/V8.class"
+        val v8Url = Graphviz::class.java.classLoader.getResource(resource)
+        val engine = if (v8Url != null) GraphvizV8Engine() else GraphvizJdkEngine()
+
+        Graphviz.useEngine(engine)
         Graphviz.fromGraph(graph).render(format).toFile(outputFile)
     }
 }
