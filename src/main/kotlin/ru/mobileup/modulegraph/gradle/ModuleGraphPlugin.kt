@@ -22,7 +22,7 @@ abstract class ModuleGraphExtension {
     companion object {
         private const val DEFAULT_RESULT_JSON_FILE_NAME = "modules.json"
         private const val DEFAULT_RESULT_DOT_FILE_NAME = "modules.dot"
-        private const val DEFAULT_RESULT_IMAGE_FILE_NAME = "modules.png"
+        private const val DEFAULT_RESULT_IMAGE_FILE_NAME = "modules.svg"
         private const val DEFAULT_MIN_CYCLES = 0
     }
 
