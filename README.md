@@ -9,7 +9,7 @@ Gradle plugin for creating a dependency diagram graph of package-modules. It loo
 1) Add dependency to root build.gradle
 ```kotlin
 plugins {
-    id("ru.mobileup.module-graph") version "1.3.1" apply false
+    id('ru.mobileup.module-graph') version '1.3.2' apply false
 }
 buildscript {
     repositories {
@@ -21,13 +21,18 @@ buildscript {
 2) Setup plugin at features build.gradle
 ```kotlin
 plugins {
-    id("ru.mobileup.module-graph")
+    id('ru.mobileup.module-graph')
 }
 
 moduleGraph {
-    featuresPackage = "com.domain.package"
-    featuresDirectory = project.file("src/main/kotlin/com/domain/package")
-    outputDirectory = project.file("module_graph")
+    featuresPackage = 'com.domain.package'
+    featuresDirectory = project.file('src/main/kotlin/com/domain/package')
+    outputDirectory = project.file('module_graph')
+    
+    minCycles = 5 // optional, default is 0
+    resultJsonFileName = 'graph.json' // optional, default is 'modules.json'
+    resultDotFileName = 'graph.dot' // optional, default is 'modules.dot'
+    resultImageFileName = 'graph.svg' // optional, default is 'modules.svg'
 }
 ```
 
