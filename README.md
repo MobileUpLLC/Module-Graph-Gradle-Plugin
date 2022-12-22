@@ -9,7 +9,7 @@ Gradle plugin for creating a dependency diagram graph of package-modules. It loo
 1) Add dependency to root build.gradle
 ```kotlin
 plugins {
-    id('ru.mobileup.module-graph') version '1.3.2' apply false
+    id('ru.mobileup.module-graph') version '1.3.3' apply false
 }
 buildscript {
     repositories {
