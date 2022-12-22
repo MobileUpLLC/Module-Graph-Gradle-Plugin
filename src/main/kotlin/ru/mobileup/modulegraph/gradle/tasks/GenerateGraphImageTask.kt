@@ -1,5 +1,6 @@
 package ru.mobileup.modulegraph.gradle.tasks
 
+import guru.nidi.graphviz.engine.Format
 import guru.nidi.graphviz.engine.Graphviz
 import guru.nidi.graphviz.engine.GraphvizJdkEngine
 import guru.nidi.graphviz.engine.GraphvizV8Engine
@@ -12,6 +13,7 @@ import org.gradle.api.tasks.TaskAction
 import ru.mobileup.modulegraph.getImageFileFormat
 import ru.mobileup.modulegraph.importGraphByDot
 import java.io.File
+
 
 abstract class GenerateGraphImageTask : DefaultTask() {
 
@@ -29,7 +31,25 @@ abstract class GenerateGraphImageTask : DefaultTask() {
 
     private fun exportGraphToImage(graph: MutableGraph, outputFile: File) {
         val format = outputFile.getImageFileFormat()
+
         Graphviz.useEngine(GraphvizV8Engine(), GraphvizJdkEngine())
         Graphviz.fromGraph(graph).render(format).toFile(outputFile)
+
+        if (format == Format.SVG) replaceEndLineCharacter(outputFile)
+    }
+
+    private fun replaceEndLineCharacter(outputFile: File) {
+        val tempFile = File(outputFile.parentFile, "temp.svg")
+
+        outputFile.copyTo(tempFile, true)
+        outputFile.writeText("")
+
+        tempFile.useLines { seq ->
+            seq.forEach { line ->
+                outputFile.appendText("${line}\n")
+            }
+        }
+
+        tempFile.delete()
     }
 }
